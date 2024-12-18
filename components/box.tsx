@@ -1,5 +1,5 @@
 import { StyleSheet, View, Pressable, Text } from "react-native";
-import Exercise from "@/types/exercise";
+import Exercise from "@/models/exercise";
 
 type Props = {
   title: string;

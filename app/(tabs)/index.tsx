@@ -2,7 +2,7 @@ import { Text, View, StyleSheet, ScrollView } from "react-native";
 import { Link } from "expo-router";
 import Button from "@/components/button";
 import Box from "@/components/box";
-import Exercise from "@/types/exercise";
+import Exercise from "@/models/exercise";
 
 export default function Index() {
   const plan: Array<Exercise> = [new Exercise("first ", 5, 5, 60)];
