@@ -2,25 +2,28 @@ import { Text, View, StyleSheet, ScrollView } from "react-native";
 import { Link } from "expo-router";
 import Button from "@/components/button";
 import Box from "@/components/box";
-import Exercise from "@/models/exercise";
+import data from "@/data/data.json";
+import { Exercise, Workout } from "@/types/types";
+import WorkoutView from "@/components/workoutView";
 
 export default function Index() {
-  const plan: Array<Exercise> = [new Exercise("first ", 5, 5, 60)];
-
+  let workouts: Workout[] = data.workouts;
   return (
-    <ScrollView showsVerticalScrollIndicator={false} style={styles.container} contentContainerStyle={{alignItems:"center"}}>
-      <Box data={plan} title="A" />
-      <Box data={plan} title="B" />
-      <Box data={plan} title="B" />
-      <Box data={plan} title="B" />
-      <Box data={plan} title="B" />
-      <Box data={plan} title="B" />
+    <ScrollView
+      showsVerticalScrollIndicator={false}
+      style={styles.container}
+      contentContainerStyle={{ alignItems: "center" }}
+    >
+      {workouts.map((workout) => {
+        return <WorkoutView workout={workout} />;
+      })}
     </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
+    display: "flex",
     flexDirection: "column",
     backgroundColor: "#25292e",
     flex: 1,
