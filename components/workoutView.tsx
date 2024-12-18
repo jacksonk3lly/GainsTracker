@@ -1,6 +1,5 @@
-import { Text, View, StyleSheet, ScrollView } from "react-native";
+import { View, StyleSheet, Text } from "react-native";
 import Box from "@/components/box";
-import data from "@/data/data.json";
 import { Exercise, Workout } from "@/types/types";
 
 type Props = {
@@ -10,13 +9,13 @@ type Props = {
 export default function WorkoutView({ workout }: Props) {
   let exercises: Exercise[] = workout.exercises;
   return (
-    <view style={styles.container}>
-      <text style={styles.text}>{workout.name}</text>
-      <text style={styles.text}>{workout.date}</text>
+    <View style={styles.container}>
+      <Text style={styles.text}>{workout.name}</Text>
+      <Text style={styles.text}>{workout.date}</Text>
       {exercises.map((exercise) => {
-        return <Box exercise={exercise} />;
+        return <Box key={exercise.id} exercise={exercise} />;
       })}
-    </view>
+    </View>
   );
 }
 

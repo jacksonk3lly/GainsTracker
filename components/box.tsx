@@ -18,10 +18,12 @@ export default function Box({ exercise }: Props) {
   console.log("here");
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>{exercise.name}</Text>
-      <br />
+      <Text style={styles.title}>
+        {exercise.name}
+        {"\n"}
+      </Text>
       {sets.map((set) => {
-        return <SetText set={set} />;
+        return <SetText key={set.id} set={set} />;
       })}
     </View>
   );
@@ -34,7 +36,6 @@ const styles = StyleSheet.create({
     padding: 10,
     width: "100%",
     backgroundColor: "#4a4646",
-    height: 100,
     shadowColor: "#000",
     shadowOffset: { width: -2, height: 2 },
     shadowOpacity: 0.75,

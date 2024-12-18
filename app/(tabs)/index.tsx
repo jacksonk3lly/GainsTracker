@@ -15,7 +15,7 @@ export default function Index() {
       contentContainerStyle={{ alignItems: "center" }}
     >
       {workouts.map((workout) => {
-        return <WorkoutView workout={workout} />;
+        return <WorkoutView key={workout.id} workout={workout} />;
       })}
     </ScrollView>
   );
