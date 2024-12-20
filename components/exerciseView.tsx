@@ -8,7 +8,7 @@ type Props = {
 function SetText({ set }: { set: Set }) {
   return (
     <Text style={{ color: "#fff" }}>
-      {set.weight} x {set.reps} x {set.weight} kg
+      {set.weight} kg x {set.reps}
     </Text>
   );
 }
@@ -19,7 +19,7 @@ export default function Box({ exercise }: Props) {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>
-        {exercise.name}
+        {exercise.id}
         {"\n"}
       </Text>
       {sets.map((set) => {

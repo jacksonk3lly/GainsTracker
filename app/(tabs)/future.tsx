@@ -3,14 +3,33 @@ import { Link } from "expo-router";
 import Button from "@/components/button";
 import Box from "@/components/exerciseView";
 import data from "@/data/data.json";
+import plans from "@/data/plans.json";
 import { Exercise, Workout } from "@/types/types";
 import WorkoutView from "@/components/workoutView";
 
-export default function Index() {
-  let workouts: Workout[] = data.workouts.map(workout => ({
-    ...workout,
-    date: new Date(workout.date),
-  }));
+export default function Future() {
+  let workouts: Workout[];
+  let plan = plans.plans[0];
+  let days = plan.days;
+
+  let daysAhead = 0;
+
+
+  let futureWorkoutsSet = days.map((day) => {
+
+    let date: Date = new Date(new Date().setDate(new Date().getDate() + daysAhead));
+    let workout: Workout = {
+      id: day.id,
+      date: date,
+      name: day.id,
+      exercises: day.exercises as Exercise[],
+    };
+    daysAhead+=2
+    return workout;
+  });
+
+  workouts = futureWorkoutsSet;
+
   return (
     <ScrollView
       showsVerticalScrollIndicator={false}

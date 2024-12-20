@@ -8,14 +8,23 @@ export type Set = {
 // Define the Exercise type
 export type Exercise = {
   id: string;
-  name: string;
   sets: Set[];
 };
 
 // Define the Workout type
 export type Workout = {
   id: string;
-  date: string; // or Date if you're using date objects
+  date: Date; // or Date if you're using date objects
   name?: string; // optional name
   exercises: Exercise[];
 };
+
+export type Plan = {
+  id: string;
+  days: DayPlan[];
+};
+
+export type DayPlan = {
+  id: string;
+  exercises: Exercise[];
+}

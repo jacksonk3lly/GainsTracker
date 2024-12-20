@@ -6,24 +6,21 @@
       "name": "Push Day",
       "exercises": [
         {
-          "id": "exercise_01",
-          "name": "Bench Press",
+          "id": "Bench Press",
           "sets": [
             { "id": "set_01", "weight": 65, "reps": 10 },
             { "id": "set_02", "weight": 65, "reps": 8 }
           ]
         },
         {
-          "id": "exercise_03",
-          "name": "Shoulder Press",
+          "id": "Shoulder Press",
           "sets": [
             { "id": "set_01", "weight": 30, "reps": 10 },
             { "id": "set_02", "weight": 30, "reps": 8 }
           ]
         },
         {
-          "id": "exercise_04",
-          "name": "Tricep Dips",
+          "id": "Tricep Dips",
           "sets": [
             { "id": "set_01", "weight": 10, "reps": 12 },
             { "id": "set_02", "weight": 10, "reps": 10 }
@@ -37,24 +34,21 @@
       "name": "Pull Day",
       "exercises": [
         {
-          "id": "exercise_05",
-          "name": "Deadlift",
+          "id": "Deadlift",
           "sets": [
             { "id": "set_01", "weight": 100, "reps": 5 },
             { "id": "set_02", "weight": 100, "reps": 5 }
           ]
         },
         {
-          "id": "exercise_06",
-          "name": "Pull Up",
+          "id": "Pull Up",
           "sets": [
             { "id": "set_01", "weight": 0, "reps": 8 },
             { "id": "set_02", "weight": 0, "reps": 6 }
           ]
         },
         {
-          "id": "exercise_07",
-          "name": "Bicep Curl",
+          "id": "Bicep Curl",
           "sets": [
             { "id": "set_01", "weight": 20, "reps": 12 },
             { "id": "set_02", "weight": 20, "reps": 10 }
@@ -69,24 +63,21 @@
       "name": "Leg Day",
       "exercises": [
         {
-          "id": "exercise_08",
-          "name": "Squat",
+          "id": "Squat",
           "sets": [
             { "id": "set_01", "weight": 80, "reps": 10 },
             { "id": "set_02", "weight": 80, "reps": 8 }
           ]
         },
         {
-          "id": "exercise_09",
-          "name": "Leg Press",
+          "id": "Leg Press",
           "sets": [
             { "id": "set_01", "weight": 120, "reps": 12 },
             { "id": "set_02", "weight": 120, "reps": 10 }
           ]
         },
         {
-          "id": "exercise_10",
-          "name": "Calf Raise",
+          "id": "Calf Raise",
           "sets": [
             { "id": "set_01", "weight": 40, "reps": 15 },
             { "id": "set_02", "weight": 40, "reps": 12 }
