@@ -1,21 +1,27 @@
 import { View, StyleSheet, Text } from "react-native";
 import Box from "@/components/exerciseView";
-import { Exercise, Workout } from "@/types/types";
+import { getExerciseUseIds } from "@/db";
+import React, { useState, useEffect } from "react";
 
 type Props = {
-  workout: Workout;
+  workoutId: number;
 };
 
-export default function WorkoutView({ workout }: Props) {
-  let exercises: Exercise[] = workout.exercises;
+export default function WorkoutView({ workoutId }: Props) {
+  const [exerciseUseIds, setExerciseUseIds] = useState<number[]>([]);
 
+  useEffect(() => {
+    async function fetchExerciseUseIds() {
+      const ids = await getExerciseUseIds(workoutId);
+      setExerciseUseIds(ids);
+    }
+    fetchExerciseUseIds();
+  }, [workoutId]);
 
   return (
     <View style={styles.container}>
-      <Text style={styles.text}>{workout.name}</Text>
-      <Text style={styles.text}>{formatDate(workout.date)}</Text>
-      {exercises.map((exercise) => {
-        return <Box key={exercise.id} exercise={exercise} />;
+      {exerciseUseIds.map((exerciseUseId) => {
+        return <Box key={exerciseUseId} exerciseUseId={exerciseUseId} />;
       })}
     </View>
   );
@@ -40,15 +46,11 @@ const styles = StyleSheet.create({
   },
 });
 
-
-
-
 function formatDate(date: Date): string {
-    const options: Intl.DateTimeFormatOptions = {
+  const options: Intl.DateTimeFormatOptions = {
     weekday: "long", // Full name of the weekday (e.g., 'Monday')
-    month: "long",   // Full name of the month (e.g., 'December')
-    day: "numeric"// Day of the month (e.g., '20')
-    };
-    return new Intl.DateTimeFormat('en-US', options).format(date);
+    month: "long", // Full name of the month (e.g., 'December')
+    day: "numeric", // Day of the month (e.g., '20')
+  };
+  return new Intl.DateTimeFormat("en-US", options).format(date);
 }
-

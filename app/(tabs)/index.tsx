@@ -2,23 +2,21 @@ import { Text, View, StyleSheet, ScrollView } from "react-native";
 import { Link } from "expo-router";
 import Button from "@/components/button";
 import Box from "@/components/exerciseView";
-import data from "@/data/data.json";
+import { getWorkoutIds } from "@/db";
 import { Exercise, Workout } from "@/types/types";
 import WorkoutView from "@/components/workoutView";
+import { get } from "react-native/Libraries/TurboModule/TurboModuleRegistry";
 
-export default function Index() {
-  let workouts: Workout[] = data.workouts.map(workout => ({
-    ...workout,
-    date: new Date(workout.date),
-  }));
+export default async function Index() {
+  let workoutIds: number[] = await getWorkoutIds();
   return (
     <ScrollView
       showsVerticalScrollIndicator={false}
       style={styles.container}
       contentContainerStyle={{ alignItems: "center" }}
     >
-      {workouts.map((workout) => {
-        return <WorkoutView key={workout.id} workout={workout} />;
+      {workoutIds.map((workoutId) => {
+        return <WorkoutView key={workoutId} workoutId={workoutId} />;
       })}
     </ScrollView>
   );

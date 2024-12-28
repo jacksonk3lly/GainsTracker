@@ -1,6 +1,6 @@
 // Define the Set type
 export type Set = {
-  id: string; // or number if preferred
+  id: number; // or number if preferred
   weight: number;
   reps: number;
 };
@@ -27,4 +27,4 @@ export type Plan = {
 export type DayPlan = {
   id: string;
   exercises: Exercise[];
-}
+};

@@ -1,11 +1,27 @@
 import { StyleSheet, View, Pressable, Text } from "react-native";
 import { Exercise, Set } from "@/types/types";
+import { getSet, getSetIds } from "@/db";
+import React, { useState, useEffect } from "react";
 
 type Props = {
-  exercise: Exercise;
+  exerciseUseId: number;
 };
 
-function SetText({ set }: { set: Set }) {
+function SetText({ setId }: { setId: number }) {
+  const [set, setSet] = useState<Set | null>(null);
+
+  useEffect(() => {
+    async function fetchSet() {
+      const fetchedSet = await getSet(setId);
+      setSet(fetchedSet);
+    }
+    fetchSet();
+  }, [setId]);
+
+  if (!set) {
+    return <Text style={{ color: "#fff" }}>Loading...</Text>;
+  }
+
   return (
     <Text style={{ color: "#fff" }}>
       {set.weight} kg x {set.reps}
@@ -13,17 +29,25 @@ function SetText({ set }: { set: Set }) {
   );
 }
 
-export default function Box({ exercise }: Props) {
-  let sets: Set[] = exercise.sets;
-  console.log("here");
+export default function Box({ exerciseUseId }: Props) {
+  const [setIds, setSetIds] = useState<number[]>([]);
+
+  useEffect(() => {
+    async function fetchSetIds() {
+      const ids = await getSetIds(exerciseUseId);
+      setSetIds(ids);
+    }
+    fetchSetIds();
+  }, [exerciseUseId]);
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>
-        {exercise.id}
+        {exerciseUseId}
         {"\n"}
       </Text>
-      {sets.map((set) => {
-        return <SetText key={set.id} set={set} />;
+      {setIds.map((setId) => {
+        return <SetText key={setId} setId={setId} />;
       })}
     </View>
   );
