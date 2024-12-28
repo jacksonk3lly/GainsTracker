@@ -1,7 +1,8 @@
 import { View, StyleSheet, Text } from "react-native";
 import Box from "@/components/exerciseView";
-import { getExerciseUseIds } from "@/db";
+import { getExerciseUseIds, getWorkoutTime } from "@/db";
 import React, { useState, useEffect } from "react";
+import { get } from "react-native/Libraries/TurboModule/TurboModuleRegistry";
 
 type Props = {
   workoutId: number;
@@ -9,9 +10,20 @@ type Props = {
 
 export default function WorkoutView({ workoutId }: Props) {
   const [exerciseUseIds, setExerciseUseIds] = useState<number[]>([]);
+  const [time, setTime] = useState<string>("");
 
   useEffect(() => {
+    async function fetchWorkoutTime() {
+      const fetchedTime = await getWorkoutTime(workoutId);
+      // console.log(fetchWorkoutTime);
+      setTime(fetchedTime);
+    }
+    fetchWorkoutTime();
+  }, [time]);
+
+  const db = useEffect(() => {
     async function fetchExerciseUseIds() {
+      console.log("workout id in Exercise", workoutId);
       const ids = await getExerciseUseIds(workoutId);
       setExerciseUseIds(ids);
     }
@@ -20,6 +32,8 @@ export default function WorkoutView({ workoutId }: Props) {
 
   return (
     <View style={styles.container}>
+      <Text style={styles.text}>{time}</Text>
+
       {exerciseUseIds.map((exerciseUseId) => {
         return <Box key={exerciseUseId} exerciseUseId={exerciseUseId} />;
       })}
@@ -38,19 +52,11 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     gap: 10,
     padding: 10,
-    marginBottom: 10,
+    // marginBottom: 5,
+    marginTop: 10,
   },
   text: {
     color: "#fff",
     fontSize: 24,
   },
 });
-
-function formatDate(date: Date): string {
-  const options: Intl.DateTimeFormatOptions = {
-    weekday: "long", // Full name of the weekday (e.g., 'Monday')
-    month: "long", // Full name of the month (e.g., 'December')
-    day: "numeric", // Day of the month (e.g., '20')
-  };
-  return new Intl.DateTimeFormat("en-US", options).format(date);
-}

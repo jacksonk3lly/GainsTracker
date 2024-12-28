@@ -33,7 +33,13 @@
           "backgroundColor": "#ffffff"
         }
       ],
-      "expo-sqlite"
+      "expo-sqlite",
+      [
+        "expo-font",
+        {
+          "SedgwickAveDisplay-Regular": "./assets/fonts/SedgwickAveDisplay-Regular.ttf"
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true

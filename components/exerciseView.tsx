@@ -1,6 +1,6 @@
-import { StyleSheet, View, Pressable, Text } from "react-native";
-import { Exercise, Set } from "@/types/types";
-import { getSet, getSetIds } from "@/db";
+import { StyleSheet, View, Text } from "react-native";
+import { Set } from "@/types/types";
+import { getExerciseName, getSet, getSetIds } from "@/db";
 import React, { useState, useEffect } from "react";
 
 type Props = {
@@ -31,6 +31,7 @@ function SetText({ setId }: { setId: number }) {
 
 export default function Box({ exerciseUseId }: Props) {
   const [setIds, setSetIds] = useState<number[]>([]);
+  const [exerciseName, setExerciseName] = useState<string | null>(null);
 
   useEffect(() => {
     async function fetchSetIds() {
@@ -40,10 +41,18 @@ export default function Box({ exerciseUseId }: Props) {
     fetchSetIds();
   }, [exerciseUseId]);
 
+  useEffect(() => {
+    async function fetchExerciseName() {
+      const name = await getExerciseName(exerciseUseId);
+      setExerciseName(name);
+    }
+    fetchExerciseName();
+  }, [exerciseName]);
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>
-        {exerciseUseId}
+        {exerciseName}
         {"\n"}
       </Text>
       {setIds.map((setId) => {

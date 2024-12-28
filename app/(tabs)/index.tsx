@@ -1,14 +1,26 @@
+import { useContext, useEffect, useState } from "react";
 import { Text, View, StyleSheet, ScrollView } from "react-native";
 import { Link } from "expo-router";
 import Button from "@/components/button";
 import Box from "@/components/exerciseView";
 import { getWorkoutIds } from "@/db";
-import { Exercise, Workout } from "@/types/types";
 import WorkoutView from "@/components/workoutView";
-import { get } from "react-native/Libraries/TurboModule/TurboModuleRegistry";
+import { useSQLiteContext } from "expo-sqlite";
 
-export default async function Index() {
-  let workoutIds: number[] = await getWorkoutIds();
+let db: any = null;
+export default function Index() {
+  const [workoutIds, setWorkoutIds] = useState<number[]>([]);
+  db = useSQLiteContext();
+
+  useEffect(() => {
+    async function fetchWorkoutIds() {
+      const ids = await getWorkoutIds();
+      setWorkoutIds(ids);
+      // console.log(ids);
+    }
+    fetchWorkoutIds();
+  }, []);
+
   return (
     <ScrollView
       showsVerticalScrollIndicator={false}
@@ -21,6 +33,7 @@ export default async function Index() {
     </ScrollView>
   );
 }
+export { db };
 
 const styles = StyleSheet.create({
   container: {

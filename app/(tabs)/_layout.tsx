@@ -1,19 +1,36 @@
 import { Stack } from "expo-router";
+import { useFonts } from "expo-font";
 import { Tabs } from "expo-router";
 import Ionicons from "@expo/vector-icons/Ionicons";
 
 export default function TabLayout() {
+  const [fontsLoaded] = useFonts({
+    "SedgwickAveDisplay-Regular": require("../../assets/fonts/SedgwickAveDisplay-Regular.ttf"),
+  });
+
+  if (!fontsLoaded) {
+    return null; // or a loading spinner
+  }
+
   return (
     <Tabs
       screenOptions={{
         // tabBarActiveTintColor: "#ffd33d",
         headerStyle: {
-          backgroundColor: "#25292e",
+          // backgroundColor: "#25292e",
+          backgroundColor: "green",
+          height: 100,
         },
         headerTintColor: "#fff",
         headerShadowVisible: false,
         tabBarStyle: {
           backgroundColor: "#25292e",
+        },
+        tabBarActiveTintColor: "green",
+        headerTitleStyle: {
+          fontFamily: "SedgwickAveDisplay-Regular", // Use the custom font
+          fontSize: 30, // Add your desired font size here
+          // height: 100,
         },
       }}
     >
@@ -45,7 +62,6 @@ export default function TabLayout() {
         }}
       />
 
-      
       <Tabs.Screen
         name="about"
         options={{
