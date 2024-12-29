@@ -17,10 +17,9 @@ export default function TabLayout() {
       screenOptions={{
         // tabBarActiveTintColor: "#ffd33d",
         headerStyle: {
-          // backgroundColor: "#25292e",
           backgroundColor: "green",
-          height: 100,
         },
+        headerShown: true,
         headerTintColor: "#fff",
         headerShadowVisible: false,
         tabBarStyle: {
@@ -28,9 +27,9 @@ export default function TabLayout() {
         },
         tabBarActiveTintColor: "green",
         headerTitleStyle: {
-          fontFamily: "SedgwickAveDisplay-Regular", // Use the custom font
+          fontFamily: fontsLoaded ? "SedgwickAveDisplay-Regular" : "System",
           fontSize: 30, // Add your desired font size here
-          color: "green",
+          // color: "green",
           // height: 100,
         },
       }}
