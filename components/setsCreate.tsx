@@ -2,33 +2,44 @@ import { View, StyleSheet, Button, Text, TextInput } from "react-native";
 import RNPickerSelect from "react-native-picker-select";
 import { useState } from "react";
 
-export default function ExerciseAdd() {
-  const [sets, addSets] = useState<JSX.Element[]>([]);
+type setCreateProps = {
+  weight?: number;
+  reps?: number;
+};
 
-  function setAdd() {
-    addSets([
-      ...sets,
-      <View style={styles.set} key={sets.length}>
+function SetCreateComponent({ weight, reps }: setCreateProps) {
+  return (
+    <View style={styles.set}>
+      <View style={{ width: "50%" }}>
         <TextInput
           id="weight"
           placeholder="Enter weight"
           style={styles.input}
+          value={weight ? weight.toString() : ""}
           placeholderTextColor="dimgray"
+          keyboardType="numeric"
         />
-        <TextInput
-          placeholderTextColor="dimgray"
-          id="unit"
-          placeholder="Unit"
-          style={styles.input}
-        />
+      </View>
+
+      <View style={{ width: "50%" }}>
         <TextInput
           placeholderTextColor="dimgray"
           id="rep"
+          value={reps ? reps.toString() : ""}
+          keyboardType="numeric"
           placeholder="Enter Reps"
           style={styles.input}
         />
-      </View>,
-    ]);
+      </View>
+    </View>
+  );
+}
+
+export default function ExerciseAdd() {
+  const [sets, addSets] = useState<JSX.Element[]>([]);
+
+  function setAdd() {
+    addSets([...sets, <SetCreateComponent />]);
   }
 
   return (
@@ -36,6 +47,7 @@ export default function ExerciseAdd() {
       <Text style={styles.text}>Name</Text>
       <TextInput
         style={styles.input}
+        placeholderTextColor="dimgray"
         id="name"
         placeholder="Enter Exercise Name"
       />
@@ -73,8 +85,8 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     // backgroundColor: "red",
     margin: 20,
-    flex: 1,
-    width: "100%",
+    flex: 2,
+    // width: "100%",
   },
   buttonContainer: {
     backgroundColor: "green",

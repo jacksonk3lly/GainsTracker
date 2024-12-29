@@ -1,19 +1,51 @@
-import { Text, View, StyleSheet, ScrollView, Button } from "react-native";
+import {
+  Text,
+  View,
+  StyleSheet,
+  ScrollView,
+  Button,
+  Alert,
+} from "react-native";
 import data from "@/data/data.json";
 import { Exercise, Workout } from "@/types/types";
 import WorkoutCreate from "@/components/workoutCreate";
 import ExerciseAdd from "@/components/setsCreate";
-import { useNavigation } from "@react-navigation/native";
-import { Link, Stack } from "expo-router";
+import { Link, Stack, useRouter } from "expo-router";
+import {
+  activeWorkoutExists,
+  newActiveWorkout,
+  newWorkout,
+  printWorkouts,
+} from "@/db";
+import { useSQLiteContext } from "expo-sqlite";
 
 type RootStackParamList = {
   NewWorkoutOverlay: undefined;
 };
 
 export default function Create() {
+  const router = useRouter();
   const exerciseAdder = () => {
     return <ExerciseAdd />;
   };
+
+  const db = useSQLiteContext();
+  function newBlank() {
+    try {
+      printWorkouts();
+      const exists = activeWorkoutExists();
+      if (exists) {
+        Alert.alert(
+          "There is already an active workout. Please finish it before starting a new one."
+        );
+        return;
+      }
+      newActiveWorkout();
+      router.navigate("/activeWorkout");
+    } catch (e) {
+      console.error("Error checking active workout:", e);
+    }
+  }
 
   return (
     <ScrollView
@@ -24,15 +56,17 @@ export default function Create() {
       {/* <WorkoutCreate /> */}
       <View style={styles.container}>
         <View style={styles.buttonContainer}>
-          <Link href="/activeWorkout" style={styles.button}>
+          {/* <Link href="/activeWorkout" style={styles.button}>
             New Blank Workout
-          </Link>
+          </Link> */}
+          <Button title="New Blank Workout" onPress={newBlank} color={"#fff"} />
         </View>
 
         <View style={styles.buttonContainer}>
-          <Link href="/notfound" style={styles.button}>
-            New 5x5 Workout
-          </Link>
+          {/* <Link href="/notfound" style={styles.button}>
+            New 5x5 Workout{" "}
+          </Link> */}
+          <Text>New 5x5</Text>
         </View>
       </View>
     </ScrollView>

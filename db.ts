@@ -2,13 +2,57 @@ import * as SQLite from "expo-sqlite";
 import { useSQLiteContext } from "expo-sqlite";
 import { Set } from "@/types/types";
 import { db } from "@/app/(tabs)/index";
+import { get } from "react-native/Libraries/TurboModule/TurboModuleRegistry";
 
 // const db = useSQLiteContext();
 
-export function newWorkout(time: string) {
-  return db.execAsync(`
-    INSERT INTO workouts (time) VALUES (CURRENT_TIMESTAMP);
+export function newWorkout() {
+  db.execSync(`
+    INSERT INTO Workouts (start_time) VALUES (CURRENT_TIMESTAMP);
   `);
+}
+
+export function printWorkouts() {
+  try {
+    const rows = db.getAllSync("SELECT * FROM Workouts;");
+    console.log(rows);
+  } catch (e) {
+    console.error("Error printing workouts:", e);
+  }
+}
+
+export function activeWorkoutExists(): boolean {
+  try {
+    const row = db.getFirstSync(`SELECT 1 FROM ActiveWorkout LIMIT 1;`);
+    return !!row;
+  } catch (e) {
+    console.error("Error checking active workout:", e);
+    return false;
+  }
+}
+
+export function newActiveWorkout() {
+  try {
+    newWorkout();
+    let id = getMostRecentWorkoutId();
+    db.execSync(`
+      INSERT INTO ActiveWorkout (active_workout_id) VALUES (${id});
+    `);
+  } catch (e) {
+    console.error("Error creating new active workout:", e);
+  }
+}
+
+export function getMostRecentWorkoutId(): number {
+  try {
+    const row = db.getFirstSync(
+      `SELECT id FROM Workouts ORDER BY start_time DESC LIMIT 1;`
+    );
+    return row.id;
+  } catch (e) {
+    console.error("Error getting most recent workout ID:", e);
+    return -1;
+  }
 }
 
 export function newExercise(id: string) {
@@ -43,6 +87,7 @@ export async function getWorkoutIds(): Promise<number[]> {
 
     return rows.map((row) => row.id);
   } catch (e) {
+    console.error("Error getting workout IDs:", e);
     return [];
   }
 }
@@ -55,18 +100,22 @@ export async function getExerciseUseIds(workoutId: number): Promise<number[]> {
 
     return rows.map((row) => row.id);
   } catch (e) {
-    console.log(e);
+    console.error("Error getting exercise use IDs:", e);
+    return [];
   }
-
-  return [];
 }
 
 export async function getSetIds(exerciseUseId: number): Promise<number[]> {
-  const rows: { id: number }[] = db.getAllSync(`
+  try {
+    const rows: { id: number }[] = db.getAllSync(`
     SELECT id FROM sets WHERE exercise_use_id = ${exerciseUseId};
   `);
 
-  return rows.map((row) => row.id);
+    return rows.map((row) => row.id);
+  } catch (e) {
+    console.error("Error getting set IDs:", e);
+    return [];
+  }
 }
 
 export async function getExerciseName(
@@ -79,33 +128,36 @@ export async function getExerciseName(
     WHERE id = ${exerciseUseId};
   `);
 
-    // console.log("here", row);
     return row ? row.exercise_id : null;
   } catch (e) {
-    console.log(e);
+    console.error("Error getting exercise name:", e);
+    return null;
   }
-
-  return null;
 }
 
 export async function getSet(setId: number): Promise<Set> {
-  const row = await db.getFirstAsync(`
+  try {
+    const row = await db.getFirstAsync(`
     SELECT reps, weight
     FROM sets
     WHERE id = ${setId};
   `);
 
-  if (!row) {
-    throw new Error("Set not found");
+    if (!row) {
+      throw new Error("Set not found");
+    }
+
+    let set: Set = {
+      id: setId,
+      weight: row.weight,
+      reps: row.reps,
+    };
+
+    return set;
+  } catch (e) {
+    console.error("Error getting set:", e);
+    throw e;
   }
-
-  let set: Set = {
-    id: setId,
-    weight: row.weight,
-    reps: row.reps,
-  };
-
-  return set;
 }
 
 export async function getWorkoutTime(workoutId: number): Promise<string> {
@@ -118,7 +170,7 @@ export async function getWorkoutTime(workoutId: number): Promise<string> {
 
     return row?.start_time ?? "";
   } catch (e) {
-    console.log(e);
+    console.error("Error getting workout time:", e);
     return "";
   }
 }

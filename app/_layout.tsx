@@ -6,7 +6,7 @@ import { Stack } from "expo-router";
 export default function RootLayout() {
   return (
     <SQLiteProvider
-      databaseName="test.db"
+      databaseName="SQLite.db"
       assetSource={{ assetId: require("../assets/SQLite.db") }}
     >
       <Stack>
@@ -15,17 +15,13 @@ export default function RootLayout() {
           name="activeWorkout"
           options={{
             presentation: "modal",
-
             headerStyle: {
-              // backgroundColor: "#25292e",
               backgroundColor: "green",
             },
-
             headerTintColor: "#fff",
             headerTitleStyle: {
-              fontFamily: "SedgwickAveDisplay-Regular", // Use the custom font
-              fontSize: 30, // Add your desired font size here
-              // height: 100,
+              fontFamily: "SedgwickAveDisplay-Regular",
+              fontSize: 30,
             },
           }}
         />

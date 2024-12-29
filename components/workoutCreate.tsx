@@ -1,13 +1,12 @@
 import { View, StyleSheet, Button, Text, TextInput } from "react-native";
+import { Alert } from "react-native";
 import { Exercise, Workout } from "@/types/types";
 import { useState } from "react";
 import ExerciseAdd from "@/components/setsCreate";
 
-type Props = {
-  workout: Workout;
-};
+export default function WorkoutCreate({ workoutId }: { workoutId?: number }) {
+  // foundExercises = getExerciseUses(workoutId);
 
-export default function WorkoutCreate() {
   const [exercises, setExercises] = useState<
     { exercise: JSX.Element[]; sets: JSX.Element[] }[]
   >([]);
@@ -16,7 +15,25 @@ export default function WorkoutCreate() {
     setExercises([...exercises, { exercise: [], sets: [] }]);
   };
 
-  const submitHandler = () => {};
+  const submitHandler = () => {
+    Alert.alert(
+      "Finish Workout",
+      "Are you sure you want to finish the workout?",
+      [
+        {
+          text: "Cancel",
+          style: "cancel",
+        },
+        {
+          text: "OK",
+          onPress: () => {
+            // Handle the workout submission logic here
+          },
+        },
+      ],
+      { cancelable: false }
+    );
+  };
 
   return (
     <View style={styles.container}>
@@ -45,7 +62,11 @@ export default function WorkoutCreate() {
         />
       </View>
       <View style={styles.buttonContainer}>
-        <Button title="Submit" color={"#fff"} onPress={() => submitHandler()} />
+        <Button
+          title="FinishWorkout"
+          color={"#fff"}
+          onPress={() => submitHandler()}
+        />
       </View>
     </View>
   );

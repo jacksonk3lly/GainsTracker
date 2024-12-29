@@ -25,6 +25,13 @@ CREATE TABLE
         FOREIGN KEY (exercise_use_id) REFERENCES ExerciseUses (id)
     );
 
+CREATE TABLE
+    IF NOT EXISTS ActiveWorkout (
+        id INTEGER PRIMARY KEY CHECK (id = 1),
+        active_workout_id INTEGER NOT NULL,
+        FOREIGN KEY (active_workout_id) REFERENCES Workouts (id)
+    );
+
 INSERT INTO
     Workouts (start_time)
 VALUES

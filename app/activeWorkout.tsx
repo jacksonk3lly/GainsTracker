@@ -9,6 +9,7 @@ import {
 import { useState } from "react";
 import { useRouter } from "expo-router";
 import WorkoutCreate from "@/components/workoutCreate";
+import { getMostRecentWorkoutId } from "@/db";
 
 export default function activeWorkout() {
   const [name, setName] = useState("");
@@ -22,6 +23,7 @@ export default function activeWorkout() {
     setName("");
     setDate("");
   };
+  const workoutID = getMostRecentWorkoutId();
 
   return (
     <ScrollView
