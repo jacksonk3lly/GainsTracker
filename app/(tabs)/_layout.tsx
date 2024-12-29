@@ -30,6 +30,7 @@ export default function TabLayout() {
         headerTitleStyle: {
           fontFamily: "SedgwickAveDisplay-Regular", // Use the custom font
           fontSize: 30, // Add your desired font size here
+          color: "green",
           // height: 100,
         },
       }}

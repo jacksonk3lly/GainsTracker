@@ -11,6 +11,24 @@ export default function RootLayout() {
     >
       <Stack>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        <Stack.Screen
+          name="activeWorkout"
+          options={{
+            presentation: "modal",
+
+            headerStyle: {
+              // backgroundColor: "#25292e",
+              backgroundColor: "green",
+            },
+
+            headerTintColor: "#fff",
+            headerTitleStyle: {
+              fontFamily: "SedgwickAveDisplay-Regular", // Use the custom font
+              fontSize: 30, // Add your desired font size here
+              // height: 100,
+            },
+          }}
+        />
         <Stack.Screen name="+not-found" />
       </Stack>
     </SQLiteProvider>
