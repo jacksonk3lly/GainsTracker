@@ -3,7 +3,7 @@ import { Text, View, StyleSheet, ScrollView } from "react-native";
 import { Link } from "expo-router";
 import Button from "@/components/button";
 import Box from "@/components/exerciseView";
-import { getWorkoutIds } from "@/db";
+import { getActiveWorkoutId, getWorkoutIds } from "@/db";
 import WorkoutView from "@/components/workoutView";
 import { useSQLiteContext } from "expo-sqlite";
 
@@ -14,9 +14,10 @@ export default function Index() {
 
   useEffect(() => {
     async function fetchWorkoutIds() {
+      let activeWorkoutId = getActiveWorkoutId();
       const ids = await getWorkoutIds();
       setWorkoutIds(ids);
-      // console.log(ids);
+      setWorkoutIds(ids.filter((id) => id !== activeWorkoutId));
     }
     fetchWorkoutIds();
   }, []);

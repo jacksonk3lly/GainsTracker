@@ -1,19 +1,34 @@
 import { View, StyleSheet, Button, Text, TextInput } from "react-native";
 import { Alert } from "react-native";
 import { Exercise, Workout } from "@/types/types";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ExerciseAdd from "@/components/setsCreate";
+import {
+  newExerciseUse,
+  getExerciseUseIds,
+  getExerciseUses,
+  endActiveWorkout,
+  getAllExerciseUses,
+} from "@/db";
+import { useRouter } from "expo-router";
 
-export default function WorkoutCreate({ workoutId }: { workoutId?: number }) {
+export default function WorkoutCreate({ workoutId }: { workoutId: number }) {
   // foundExercises = getExerciseUses(workoutId);
+  const router = useRouter();
 
-  const [exercises, setExercises] = useState<
-    { exercise: JSX.Element[]; sets: JSX.Element[] }[]
-  >([]);
+  console.log("ids: ", workoutId, " data", getExerciseUses(workoutId));
+  const [exercises, setExercises] = useState<number[]>(
+    getExerciseUseIds(workoutId)
+  );
 
-  const exerciseAdder = () => {
-    setExercises([...exercises, { exercise: [], sets: [] }]);
+  const exerciseAdder = (exerciseId?: string) => {
+    const newExerciseUseId = newExerciseUse(workoutId, exerciseId);
+    setExercises([...exercises, newExerciseUseId]);
   };
+
+  // useEffect(() => {
+  //   setExercises(getExerciseUseIds(workoutId));
+  // }, [exercises]);
 
   const submitHandler = () => {
     Alert.alert(
@@ -27,7 +42,8 @@ export default function WorkoutCreate({ workoutId }: { workoutId?: number }) {
         {
           text: "OK",
           onPress: () => {
-            // Handle the workout submission logic here
+            endActiveWorkout();
+            router.back();
           },
         },
       ],
@@ -51,8 +67,8 @@ export default function WorkoutCreate({ workoutId }: { workoutId?: number }) {
         value={date}
         onChangeText={setDate}
       /> */}
-      {exercises.map((exercise, index) => (
-        <ExerciseAdd key={index} />
+      {exercises.map((exerciseUseId) => (
+        <ExerciseAdd exerciseUseId={exerciseUseId} key={exerciseUseId} />
       ))}
       <View style={styles.buttonContainer}>
         <Button
@@ -63,7 +79,7 @@ export default function WorkoutCreate({ workoutId }: { workoutId?: number }) {
       </View>
       <View style={styles.buttonContainer}>
         <Button
-          title="FinishWorkout"
+          title="Finish Workout"
           color={"#fff"}
           onPress={() => submitHandler()}
         />

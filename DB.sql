@@ -226,3 +226,8 @@ INSERT INTO
     Sets (exercise_use_id, reps, weight)
 VALUES
     (9, 12, 40);
+
+Insert Into
+    ActiveWorkout (active_workout_id, id)
+Values
+    (3, 1);

@@ -1,6 +1,8 @@
 import { View, StyleSheet, Button, Text, TextInput } from "react-native";
 import RNPickerSelect from "react-native-picker-select";
 import { useState } from "react";
+import { get } from "react-native/Libraries/TurboModule/TurboModuleRegistry";
+import { getExerciseName } from "@/db";
 
 type setCreateProps = {
   weight?: number;
@@ -35,7 +37,11 @@ function SetCreateComponent({ weight, reps }: setCreateProps) {
   );
 }
 
-export default function ExerciseAdd() {
+export default function ExerciseAdd({
+  exerciseUseId,
+}: {
+  exerciseUseId: number;
+}) {
   const [sets, addSets] = useState<JSX.Element[]>([]);
 
   function setAdd() {
@@ -48,6 +54,7 @@ export default function ExerciseAdd() {
       <TextInput
         style={styles.input}
         placeholderTextColor="dimgray"
+        value={getExerciseName(exerciseUseId)}
         id="name"
         placeholder="Enter Exercise Name"
       />

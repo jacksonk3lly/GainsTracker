@@ -25,8 +25,8 @@ type RootStackParamList = {
 
 export default function Create() {
   const router = useRouter();
-  const exerciseAdder = () => {
-    return <ExerciseAdd />;
+  const exerciseAdder = (exerciseUseId: number) => {
+    return <ExerciseAdd exerciseUseId={exerciseUseId} />;
   };
 
   const db = useSQLiteContext();
@@ -47,6 +47,12 @@ export default function Create() {
     }
   }
 
+  function resumeWorkout() {
+    if (activeWorkoutExists()) {
+      router.navigate("/activeWorkout");
+    }
+  }
+
   return (
     <ScrollView
       showsVerticalScrollIndicator={false}
@@ -54,7 +60,16 @@ export default function Create() {
       contentContainerStyle={{ alignItems: "center" }}
     >
       {/* <WorkoutCreate /> */}
+
       <View style={styles.container}>
+        <View style={styles.buttonContainer}>
+          <Button
+            title="Resume Workout"
+            color={"#fff"}
+            onPress={resumeWorkout}
+          ></Button>
+        </View>
+
         <View style={styles.buttonContainer}>
           {/* <Link href="/activeWorkout" style={styles.button}>
             New Blank Workout
@@ -63,10 +78,11 @@ export default function Create() {
         </View>
 
         <View style={styles.buttonContainer}>
-          {/* <Link href="/notfound" style={styles.button}>
-            New 5x5 Workout{" "}
-          </Link> */}
-          <Text>New 5x5</Text>
+          <Button
+            title="New 5x5 Workout"
+            color={"#fff"}
+            onPress={() => Alert.alert("not implemented")}
+          ></Button>
         </View>
       </View>
     </ScrollView>

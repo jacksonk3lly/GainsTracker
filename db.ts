@@ -31,6 +31,28 @@ export function activeWorkoutExists(): boolean {
   }
 }
 
+export function getActiveWorkoutId(): number {
+  try {
+    const row = db.getFirstSync(
+      `SELECT active_workout_id FROM ActiveWorkout LIMIT 1;`
+    );
+    return row.active_workout_id;
+  } catch (e) {
+    console.error("Error getting active workout ID:", e);
+    return -1;
+  }
+}
+
+export function endActiveWorkout() {
+  try {
+    db.execSync(`
+      DELETE FROM ActiveWorkout;
+    `);
+  } catch (e) {
+    console.error("Error ending active workout:", e);
+  }
+}
+
 export function newActiveWorkout() {
   try {
     newWorkout();
@@ -61,10 +83,21 @@ export function newExercise(id: string) {
   `);
 }
 
-export function newExerciseUse(workoutId: number, exerciseId: string) {
-  return db.execAsync(`
-    INSERT INTO ExerciseUses (workout_id, exercise_id) VALUES (${workoutId}, ${exerciseId});
+export function newExerciseUse(workoutId: number, exerciseId?: string): number {
+  if (exerciseId) {
+    db.execSync(`
+      INSERT INTO ExerciseUses (workout_id, exercise_id) VALUES (${workoutId}, ${exerciseId});
+    `);
+  } else {
+    db.execSync(`
+    INSERT INTO ExerciseUses (workout_id, exercise_id) VALUES (${workoutId}, "blank");
   `);
+  }
+
+  const row = db.getFirstSync(`
+    SELECT id FROM ExerciseUses WHERE workout_id = ${workoutId} ORDER BY id DESC LIMIT 1;
+  `);
+  return row.id;
 }
 
 export function newSet(exerciseUseId: number, reps: number, weight: number) {
@@ -74,9 +107,19 @@ export function newSet(exerciseUseId: number, reps: number, weight: number) {
 }
 
 export async function getExerciseUses(workoutId: number) {
-  return db.execAsync(`
+  let rows: { id: number; exercise_id: string }[] = db.execAsync(`
     SELECT * FROM ExerciseUses WHERE workout_id = ${workoutId};
   `);
+
+  return rows;
+}
+
+export async function getAllExerciseUses() {
+  const rows: { id: number }[] = db.execSync(`
+    SELECT id FROM ExerciseUses;
+  `);
+
+  return rows.map((row) => row.id);
 }
 
 export async function getWorkoutIds(): Promise<number[]> {
@@ -92,7 +135,7 @@ export async function getWorkoutIds(): Promise<number[]> {
   }
 }
 
-export async function getExerciseUseIds(workoutId: number): Promise<number[]> {
+export function getExerciseUseIds(workoutId: number): number[] {
   try {
     const rows: { id: number }[] = db.getAllSync(`
     SELECT id FROM ExerciseUses WHERE workout_id = ${workoutId};
@@ -118,20 +161,18 @@ export async function getSetIds(exerciseUseId: number): Promise<number[]> {
   }
 }
 
-export async function getExerciseName(
-  exerciseUseId: number
-): Promise<string | null> {
+export function getExerciseName(exerciseUseId: number): string {
   try {
-    const row = await db.getFirstAsync(`
+    const row = db.getFirstSync(`
     SELECT exercise_id 
     FROM ExerciseUses 
     WHERE id = ${exerciseUseId};
   `);
 
-    return row ? row.exercise_id : null;
+    return row ? row.exercise_id : "";
   } catch (e) {
     console.error("Error getting exercise name:", e);
-    return null;
+    return "";
   }
 }
 
