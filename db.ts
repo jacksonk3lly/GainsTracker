@@ -21,6 +21,12 @@ export function printWorkouts() {
   }
 }
 
+export function setActiveWorkoutId(id: number) {
+  db.execSync(`
+    INSERT INTO ActiveWorkout (active_workout_id) VALUES (${id});
+  `);
+}
+
 export function activeWorkoutExists(): boolean {
   try {
     const row = db.getFirstSync(`SELECT 1 FROM ActiveWorkout LIMIT 1;`);
@@ -122,7 +128,7 @@ export async function getAllExerciseUses() {
   return rows.map((row) => row.id);
 }
 
-export async function getWorkoutIds(): Promise<number[]> {
+export function getWorkoutIds(): number[] {
   try {
     const rows: { id: number }[] = db.getAllSync(`
       SELECT id FROM Workouts;
@@ -148,7 +154,7 @@ export function getExerciseUseIds(workoutId: number): number[] {
   }
 }
 
-export async function getSetIds(exerciseUseId: number): Promise<number[]> {
+export function getSetIds(exerciseUseId: number): number[] {
   try {
     const rows: { id: number }[] = db.getAllSync(`
     SELECT id FROM sets WHERE exercise_use_id = ${exerciseUseId};

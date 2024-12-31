@@ -1,8 +1,8 @@
 import { View, StyleSheet, Button, Text, TextInput } from "react-native";
 import RNPickerSelect from "react-native-picker-select";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { get } from "react-native/Libraries/TurboModule/TurboModuleRegistry";
-import { getExerciseName } from "@/db";
+import { getExerciseName, getSet, getSetIds } from "@/db";
 
 type setCreateProps = {
   weight?: number;
@@ -42,14 +42,31 @@ export default function ExerciseAdd({
 }: {
   exerciseUseId: number;
 }) {
+  let setIds = getSetIds(exerciseUseId);
+
   const [sets, addSets] = useState<JSX.Element[]>([]);
 
-  function setAdd() {
-    addSets([...sets, <SetCreateComponent />]);
+  function setAdd(weight?: number, reps?: number) {
+    if (weight && reps) {
+      addSets((prevSets) => [
+        ...prevSets,
+        <SetCreateComponent weight={weight} reps={reps} />,
+      ]);
+    } else {
+      addSets((prevSets) => [...prevSets, <SetCreateComponent />]);
+    }
   }
 
+  useEffect(() => {
+    setIds.forEach((setId) => {
+      getSet(setId).then((set) => {
+        setAdd(set.weight, set.reps);
+      });
+    });
+  }, [exerciseUseId]);
+
   return (
-    <View style={styles.container}>
+    <View key={exerciseUseId} style={styles.container}>
       <Text style={styles.text}>Name</Text>
       <TextInput
         style={styles.input}

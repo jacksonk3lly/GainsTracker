@@ -1,7 +1,6 @@
 import { useContext, useEffect, useState } from "react";
-import { Text, View, StyleSheet, ScrollView } from "react-native";
+import { Button, Text, View, StyleSheet, ScrollView } from "react-native";
 import { Link } from "expo-router";
-import Button from "@/components/button";
 import Box from "@/components/exerciseView";
 import { getActiveWorkoutId, getWorkoutIds } from "@/db";
 import WorkoutView from "@/components/workoutView";
@@ -12,13 +11,14 @@ export default function Index() {
   const [workoutIds, setWorkoutIds] = useState<number[]>([]);
   db = useSQLiteContext();
 
+  const fetchWorkoutIds = () => {
+    let activeWorkoutId = getActiveWorkoutId();
+    const ids = getWorkoutIds();
+    setWorkoutIds(ids);
+    setWorkoutIds(ids.filter((id) => id !== activeWorkoutId));
+  };
+
   useEffect(() => {
-    async function fetchWorkoutIds() {
-      let activeWorkoutId = getActiveWorkoutId();
-      const ids = await getWorkoutIds();
-      setWorkoutIds(ids);
-      setWorkoutIds(ids.filter((id) => id !== activeWorkoutId));
-    }
     fetchWorkoutIds();
   }, []);
 
@@ -31,6 +31,7 @@ export default function Index() {
       {workoutIds.map((workoutId) => {
         return <WorkoutView key={workoutId} workoutId={workoutId} />;
       })}
+      <Button title="Refresh" onPress={fetchWorkoutIds} />
     </ScrollView>
   );
 }
