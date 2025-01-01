@@ -13,6 +13,7 @@ import {
   getSetIds,
   newSet,
   updateExerciseUseExerciseId,
+  deleteSet,
   updateSet,
 } from "@/db";
 import { Set } from "@/types/types";
@@ -46,8 +47,13 @@ export default function ExerciseAdd({
       updateSet(set);
     }, [isSelected]);
 
-    function deleteSet() {
-      setSets((prevSets) => prevSets.filter((s) => s.id !== set.id));
+    function removeSet() {
+      try {
+        deleteSet(set.id);
+        setSets((prevSets) => prevSets.filter((s) => s.id !== set.id));
+      } catch (e) {
+        console.error("Error deleting set:", e);
+      }
     }
 
     return (
@@ -80,7 +86,7 @@ export default function ExerciseAdd({
           onPress={() => setSelection(!isSelected)}
         />
 
-        <TouchableOpacity onPress={deleteSet}>
+        <TouchableOpacity onPress={removeSet}>
           <View>
             <MaterialIcons name="delete" size={24} color="black" />
           </View>
