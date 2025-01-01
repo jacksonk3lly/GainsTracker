@@ -42,6 +42,9 @@ export function getActiveWorkoutId(): number {
     const row = db.getFirstSync(
       `SELECT active_workout_id FROM ActiveWorkout LIMIT 1;`
     );
+    if (!row) {
+      return -1;
+    }
     return row.active_workout_id;
   } catch (e) {
     console.error("Error getting active workout ID:", e);
@@ -89,6 +92,17 @@ export function newExercise(id: string) {
   `);
 }
 
+export function updateExerciseUseExerciseId(
+  exerciseUseId: number,
+  exerciseId: string
+) {
+  db.execSync(`
+    UPDATE ExerciseUses
+    SET exercise_id = "${exerciseId}"
+    WHERE id = ${exerciseUseId};
+  `);
+}
+
 export function newExerciseUse(workoutId: number, exerciseId?: string): number {
   if (exerciseId) {
     db.execSync(`
@@ -107,9 +121,44 @@ export function newExerciseUse(workoutId: number, exerciseId?: string): number {
 }
 
 export function newSet(exerciseUseId: number, reps: number, weight: number) {
-  return db.execAsync(`
+  db.execSync(`
     INSERT INTO sets (exercise_use_id, reps, weight) VALUES (${exerciseUseId}, ${reps}, ${weight});
   `);
+
+  const row = db.getFirstSync(`
+    SELECT id, weight, reps FROM sets WHERE exercise_use_id = ${exerciseUseId} ORDER BY id DESC LIMIT 1;
+  , reps, weight FROM sets WHERE exercise_use_id = ${exerciseUseId} ORDER BY id DESC LIMIT 1;
+    `);
+
+  let set: Set = {
+    id: row.id,
+    reps: row.reps,
+    weight: row.weight,
+  };
+
+  return set;
+}
+
+export function clearAllDatabases() {
+  db.execSync(`
+    DELETE FROM Workouts;
+    DELETE FROM ExerciseUses;
+    DELETE FROM sets;
+    DELETE FROM ActiveWorkout;
+  `);
+}
+
+export function updateSet(set: Set) {
+  try {
+    db.execSync(`
+      UPDATE sets
+      SET reps = ${set.reps}, weight = ${set.weight}
+      WHERE id = ${set.id};
+    `);
+  } catch (e) {
+    console.log(set);
+    console.error("Error updating set:", e);
+  }
 }
 
 export async function getExerciseUses(workoutId: number) {

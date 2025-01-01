@@ -15,7 +15,9 @@ export default function Index() {
     let activeWorkoutId = getActiveWorkoutId();
     const ids = getWorkoutIds();
     setWorkoutIds(ids);
-    setWorkoutIds(ids.filter((id) => id !== activeWorkoutId));
+    if (activeWorkoutId > 0) {
+      setWorkoutIds(ids.filter((id) => id !== activeWorkoutId));
+    }
   };
 
   useEffect(() => {

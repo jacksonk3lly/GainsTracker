@@ -2,14 +2,26 @@ import { View, StyleSheet, Button, Text, TextInput } from "react-native";
 import RNPickerSelect from "react-native-picker-select";
 import { useState, useEffect } from "react";
 import { get } from "react-native/Libraries/TurboModule/TurboModuleRegistry";
-import { getExerciseName, getSet, getSetIds } from "@/db";
+import {
+  getExerciseName,
+  getSet,
+  getSetIds,
+  newSet,
+  updateExerciseUseExerciseId,
+  updateSet,
+} from "@/db";
+import { Set } from "@/types/types";
 
-type setCreateProps = {
-  weight?: number;
-  reps?: number;
-};
+function SetCreateComponent({ set }: { set: Set }) {
+  const [weight, setWeight] = useState(set.weight);
+  const [reps, setReps] = useState(set.reps);
 
-function SetCreateComponent({ weight, reps }: setCreateProps) {
+  useEffect(() => {
+    set.reps = reps;
+    set.weight = weight;
+    updateSet(set);
+  }, [weight, reps]);
+
   return (
     <View style={styles.set}>
       <View style={{ width: "50%" }}>
@@ -20,6 +32,7 @@ function SetCreateComponent({ weight, reps }: setCreateProps) {
           value={weight ? weight.toString() : ""}
           placeholderTextColor="dimgray"
           keyboardType="numeric"
+          onChangeText={(text) => setWeight(Number(text))}
         />
       </View>
 
@@ -31,6 +44,7 @@ function SetCreateComponent({ weight, reps }: setCreateProps) {
           keyboardType="numeric"
           placeholder="Enter Reps"
           style={styles.input}
+          onChangeText={(text) => setReps(Number(text))}
         />
       </View>
     </View>
@@ -42,28 +56,32 @@ export default function ExerciseAdd({
 }: {
   exerciseUseId: number;
 }) {
-  let setIds = getSetIds(exerciseUseId);
+  const [sets, setSets] = useState<Set[]>([]);
+  const [exerciseName, setExerciseName] = useState(
+    getExerciseName(exerciseUseId)
+  );
 
-  const [sets, addSets] = useState<JSX.Element[]>([]);
-
-  function setAdd(weight?: number, reps?: number) {
-    if (weight && reps) {
-      addSets((prevSets) => [
-        ...prevSets,
-        <SetCreateComponent weight={weight} reps={reps} />,
-      ]);
+  function setAdd(set?: Set) {
+    if (set) {
+      setSets((prevSets) => [...prevSets, set]);
     } else {
-      addSets((prevSets) => [...prevSets, <SetCreateComponent />]);
+      let newSetObj: Set = newSet(exerciseUseId, 0, 0);
+      setSets((prevSets) => [...prevSets, newSetObj]);
     }
   }
 
   useEffect(() => {
+    let setIds = getSetIds(exerciseUseId);
     setIds.forEach((setId) => {
       getSet(setId).then((set) => {
-        setAdd(set.weight, set.reps);
+        setAdd(set);
       });
     });
   }, [exerciseUseId]);
+
+  useEffect(() => {
+    updateExerciseUseExerciseId(exerciseUseId, exerciseName);
+  }, [exerciseName]);
 
   return (
     <View key={exerciseUseId} style={styles.container}>
@@ -71,11 +89,14 @@ export default function ExerciseAdd({
       <TextInput
         style={styles.input}
         placeholderTextColor="dimgray"
-        value={getExerciseName(exerciseUseId)}
+        value={exerciseName}
         id="name"
         placeholder="Enter Exercise Name"
+        onChangeText={setExerciseName}
       />
-      {sets}
+      {sets.map((set) => {
+        return <SetCreateComponent set={set} key={set.id} />;
+      })}
       <View style={styles.buttonContainer}>
         <Button title="Add Set" color={"#fff"} onPress={() => setAdd()} />
       </View>

@@ -16,7 +16,6 @@ export default function WorkoutCreate({ workoutId }: { workoutId: number }) {
   // foundExercises = getExerciseUses(workoutId);
   const router = useRouter();
 
-  console.log("ids: ", workoutId, " data", getExerciseUses(workoutId));
   const [exercises, setExercises] = useState<number[]>(
     getExerciseUseIds(workoutId)
   );

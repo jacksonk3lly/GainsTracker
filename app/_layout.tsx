@@ -6,7 +6,7 @@ import { Stack } from "expo-router";
 export default function RootLayout() {
   return (
     <SQLiteProvider
-      databaseName="SQLite.db"
+      databaseName="DB.db"
       assetSource={{ assetId: require("../assets/SQLite.db") }}
     >
       <Stack>

@@ -11,7 +11,7 @@ CREATE TABLE
     IF NOT EXISTS ExerciseUses (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         workout_id INTEGER NOT NULL,
-        exercise_id INTEGER NOT NULL,
+        exercise_id TEXT NOT NULL,
         FOREIGN KEY (workout_id) REFERENCES Workouts (id),
         FOREIGN KEY (exercise_id) REFERENCES Exercises (id)
     );

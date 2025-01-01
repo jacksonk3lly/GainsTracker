@@ -50,6 +50,8 @@ export default function Create() {
   function resumeWorkout() {
     if (activeWorkoutExists()) {
       router.navigate("/activeWorkout");
+    } else {
+      Alert.alert("No active workout to resume");
     }
   }
 

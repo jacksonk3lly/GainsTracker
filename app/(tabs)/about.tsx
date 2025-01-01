@@ -5,9 +5,11 @@ import {
   TextInput,
   Button,
   ScrollView,
+  Alert,
 } from "react-native";
 import { useState } from "react";
 import { db } from "./index";
+import { clearAllDatabases } from "@/db";
 
 export default function AboutScreen() {
   const [sql, setSql] = useState("");
@@ -17,6 +19,43 @@ export default function AboutScreen() {
     try {
       const rows = db.getAllSync(sql);
       setResult(JSON.stringify(rows, null, 2));
+    } catch (e) {
+      if (e instanceof Error) {
+        setResult(`Error: ${e.message}`);
+      } else {
+        setResult("An unknown error occurred");
+      }
+    }
+  };
+
+  const clearDatabases = () => {
+    try {
+      Alert.alert(
+        "Confirm",
+        "Are you sure you want to clear all databases?",
+        [
+          {
+            text: "Cancel",
+            style: "cancel",
+          },
+          {
+            text: "OK",
+            onPress: () => {
+              try {
+                clearAllDatabases();
+                setResult("All databases cleared successfully.");
+              } catch (e) {
+                if (e instanceof Error) {
+                  setResult(`Error: ${e.message}`);
+                } else {
+                  setResult("An unknown error occurred");
+                }
+              }
+            },
+          },
+        ]
+        // { cancelable: false }
+      );
     } catch (e) {
       if (e instanceof Error) {
         setResult(`Error: ${e.message}`);
@@ -37,6 +76,7 @@ export default function AboutScreen() {
         onChangeText={setSql}
       />
       <Button title="Run SQL" onPress={runSql} />
+      <Button title="Clear All Databases" onPress={clearDatabases} />
       {result && (
         <View style={styles.resultContainer}>
           <Text style={styles.resultText}>{result}</Text>

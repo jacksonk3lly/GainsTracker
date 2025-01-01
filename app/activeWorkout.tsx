@@ -24,7 +24,6 @@ export default function activeWorkout() {
     setDate("");
   };
 
-  console.log("Active Workout ID: ", getActiveWorkoutId());
   return (
     <ScrollView
       showsVerticalScrollIndicator={false}
