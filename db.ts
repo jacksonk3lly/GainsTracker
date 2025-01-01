@@ -110,7 +110,7 @@ export function newExerciseUse(workoutId: number, exerciseId?: string): number {
     `);
   } else {
     db.execSync(`
-    INSERT INTO ExerciseUses (workout_id, exercise_id) VALUES (${workoutId}, "blank");
+    INSERT INTO ExerciseUses (workout_id, exercise_id) VALUES (${workoutId}, "");
   `);
   }
 
