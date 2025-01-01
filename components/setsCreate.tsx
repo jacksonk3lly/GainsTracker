@@ -1,4 +1,11 @@
-import { View, StyleSheet, Button, Text, TextInput } from "react-native";
+import {
+  View,
+  StyleSheet,
+  Button,
+  Text,
+  TextInput,
+  TouchableOpacity,
+} from "react-native";
 import { useState, useEffect } from "react";
 import {
   getExerciseName,
@@ -10,65 +17,77 @@ import {
 } from "@/db";
 import { Set } from "@/types/types";
 import CustomCheckbox from "./CustomCheckbox";
-
-function SetCreateComponent({ set }: { set: Set }) {
-  const [weight, setWeight] = useState(set.weight);
-  const [reps, setReps] = useState(set.reps);
-  const [isSelected, setSelection] = useState(set.selected);
-
-  useEffect(() => {
-    set.reps = reps;
-    set.weight = weight;
-    updateSet(set);
-  }, [weight, reps]);
-
-  useEffect(() => {
-    set.selected = isSelected;
-    updateSet(set);
-  }, [isSelected]);
-
-  return (
-    <View style={styles.set}>
-      <View style={{ width: "40%" }}>
-        <TextInput
-          id="weight"
-          placeholder="Enter weight"
-          style={styles.input}
-          value={weight ? weight.toString() : ""}
-          placeholderTextColor="dimgray"
-          keyboardType="numeric"
-          onChangeText={(text) => setWeight(Number(text))}
-        />
-      </View>
-
-      <View style={{ width: "40%" }}>
-        <TextInput
-          placeholderTextColor="dimgray"
-          id="rep"
-          value={reps ? reps.toString() : ""}
-          keyboardType="numeric"
-          placeholder="Enter Reps"
-          style={styles.input}
-          onChangeText={(text) => setReps(Number(text))}
-        />
-      </View>
-      <CustomCheckbox
-        isChecked={isSelected}
-        onPress={() => setSelection(!isSelected)}
-      />
-    </View>
-  );
-}
+import { MaterialIcons } from "@expo/vector-icons";
 
 export default function ExerciseAdd({
   exerciseUseId,
 }: {
   exerciseUseId: number;
 }) {
-  const [sets, setSets] = useState<Set[]>([]);
   const [exerciseName, setExerciseName] = useState(
     getExerciseName(exerciseUseId)
   );
+
+  const [sets, setSets] = useState<Set[]>([]);
+
+  function SetCreateComponent({ set }: { set: Set }) {
+    const [weight, setWeight] = useState(set.weight);
+    const [reps, setReps] = useState(set.reps);
+    const [isSelected, setSelection] = useState(set.selected);
+
+    useEffect(() => {
+      set.reps = reps;
+      set.weight = weight;
+      updateSet(set);
+    }, [weight, reps]);
+
+    useEffect(() => {
+      set.selected = isSelected;
+      updateSet(set);
+    }, [isSelected]);
+
+    function deleteSet() {
+      setSets((prevSets) => prevSets.filter((s) => s.id !== set.id));
+    }
+
+    return (
+      <View style={styles.set}>
+        <View style={{ width: "40%" }}>
+          <TextInput
+            id="weight"
+            placeholder="Enter weight"
+            style={styles.input}
+            value={weight ? weight.toString() : ""}
+            placeholderTextColor="dimgray"
+            keyboardType="numeric"
+            onChangeText={(text) => setWeight(Number(text))}
+          />
+        </View>
+
+        <View style={{ width: "40%" }}>
+          <TextInput
+            placeholderTextColor="dimgray"
+            id="rep"
+            value={reps ? reps.toString() : ""}
+            keyboardType="numeric"
+            placeholder="Enter Reps"
+            style={styles.input}
+            onChangeText={(text) => setReps(Number(text))}
+          />
+        </View>
+        <CustomCheckbox
+          isChecked={isSelected}
+          onPress={() => setSelection(!isSelected)}
+        />
+
+        <TouchableOpacity onPress={deleteSet}>
+          <View>
+            <MaterialIcons name="delete" size={24} color="black" />
+          </View>
+        </TouchableOpacity>
+      </View>
+    );
+  }
 
   function setAdd(set?: Set) {
     if (set) {

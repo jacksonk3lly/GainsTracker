@@ -30,6 +30,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     marginLeft: 10,
+    marginRight: 10,
   },
   checkbox: {
     borderRadius: 12, // Half of the width/height to make it a circle
