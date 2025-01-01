@@ -3,6 +3,7 @@ export type Set = {
   id: number; // or number if preferred
   weight: number;
   reps: number;
+  selected: boolean;
 };
 
 // Define the Exercise type

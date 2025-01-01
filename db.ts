@@ -120,20 +120,25 @@ export function newExerciseUse(workoutId: number, exerciseId?: string): number {
   return row.id;
 }
 
-export function newSet(exerciseUseId: number, reps: number, weight: number) {
+export function newSet(
+  exerciseUseId: number,
+  reps: number,
+  weight: number,
+  selected: boolean
+) {
   db.execSync(`
-    INSERT INTO sets (exercise_use_id, reps, weight) VALUES (${exerciseUseId}, ${reps}, ${weight});
+    INSERT INTO sets (selected, exercise_use_id, reps, weight) VALUES (${selected}, ${exerciseUseId}, ${reps}, ${weight});
   `);
 
   const row = db.getFirstSync(`
-    SELECT id, weight, reps FROM sets WHERE exercise_use_id = ${exerciseUseId} ORDER BY id DESC LIMIT 1;
-  , reps, weight FROM sets WHERE exercise_use_id = ${exerciseUseId} ORDER BY id DESC LIMIT 1;
-    `);
+    SELECT selected, id, weight, reps FROM sets WHERE exercise_use_id = ${exerciseUseId} ORDER BY id DESC LIMIT 1;
+  `);
 
   let set: Set = {
     id: row.id,
     reps: row.reps,
     weight: row.weight,
+    selected: row.selected,
   };
 
   return set;
@@ -152,7 +157,7 @@ export function updateSet(set: Set) {
   try {
     db.execSync(`
       UPDATE sets
-      SET reps = ${set.reps}, weight = ${set.weight}
+      SET reps = ${set.reps}, weight = ${set.weight}, selected = ${set.selected}
       WHERE id = ${set.id};
     `);
   } catch (e) {
@@ -180,7 +185,7 @@ export async function getAllExerciseUses() {
 export function getWorkoutIds(): number[] {
   try {
     const rows: { id: number }[] = db.getAllSync(`
-      SELECT id FROM Workouts;
+      SELECT id FROM Workouts ORDER BY start_time DESC;
     `);
 
     return rows.map((row) => row.id);
@@ -231,10 +236,20 @@ export function getExerciseName(exerciseUseId: number): string {
   }
 }
 
+export function deleteSet(setId: number) {
+  try {
+    db.execSync(`
+    DELETE FROM sets WHERE id = ${setId};
+  `);
+  } catch (e) {
+    console.error("Error deleting set:", e);
+  }
+}
+
 export async function getSet(setId: number): Promise<Set> {
   try {
     const row = await db.getFirstAsync(`
-    SELECT reps, weight
+    SELECT reps, weight, selected
     FROM sets
     WHERE id = ${setId};
   `);
@@ -246,6 +261,7 @@ export async function getSet(setId: number): Promise<Set> {
     let set: Set = {
       id: setId,
       weight: row.weight,
+      selected: row.selected,
       reps: row.reps,
     };
 

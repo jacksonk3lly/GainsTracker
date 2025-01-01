@@ -1,7 +1,5 @@
 import { View, StyleSheet, Button, Text, TextInput } from "react-native";
-import RNPickerSelect from "react-native-picker-select";
 import { useState, useEffect } from "react";
-import { get } from "react-native/Libraries/TurboModule/TurboModuleRegistry";
 import {
   getExerciseName,
   getSet,
@@ -11,10 +9,12 @@ import {
   updateSet,
 } from "@/db";
 import { Set } from "@/types/types";
+import CustomCheckbox from "./CustomCheckbox";
 
 function SetCreateComponent({ set }: { set: Set }) {
   const [weight, setWeight] = useState(set.weight);
   const [reps, setReps] = useState(set.reps);
+  const [isSelected, setSelection] = useState(set.selected);
 
   useEffect(() => {
     set.reps = reps;
@@ -22,9 +22,14 @@ function SetCreateComponent({ set }: { set: Set }) {
     updateSet(set);
   }, [weight, reps]);
 
+  useEffect(() => {
+    set.selected = isSelected;
+    updateSet(set);
+  }, [isSelected]);
+
   return (
     <View style={styles.set}>
-      <View style={{ width: "50%" }}>
+      <View style={{ width: "40%" }}>
         <TextInput
           id="weight"
           placeholder="Enter weight"
@@ -36,7 +41,7 @@ function SetCreateComponent({ set }: { set: Set }) {
         />
       </View>
 
-      <View style={{ width: "50%" }}>
+      <View style={{ width: "40%" }}>
         <TextInput
           placeholderTextColor="dimgray"
           id="rep"
@@ -47,6 +52,10 @@ function SetCreateComponent({ set }: { set: Set }) {
           onChangeText={(text) => setReps(Number(text))}
         />
       </View>
+      <CustomCheckbox
+        isChecked={isSelected}
+        onPress={() => setSelection(!isSelected)}
+      />
     </View>
   );
 }
@@ -65,7 +74,11 @@ export default function ExerciseAdd({
     if (set) {
       setSets((prevSets) => [...prevSets, set]);
     } else {
-      let newSetObj: Set = newSet(exerciseUseId, 0, 0);
+      const lastSet = sets[sets.length - 1];
+      let newSetObj: Set = newSet(exerciseUseId, 0, 0, false);
+      if (lastSet) {
+        newSetObj = newSet(exerciseUseId, lastSet.reps, lastSet.weight, false);
+      }
       setSets((prevSets) => [...prevSets, newSetObj]);
     }
   }
@@ -151,5 +164,8 @@ const styles = StyleSheet.create({
     color: "white",
     // borderRadius: 15,
     // width: "30%",
+  },
+  checkbox: {
+    alignSelf: "center",
   },
 });

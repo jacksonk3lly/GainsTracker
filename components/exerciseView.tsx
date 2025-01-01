@@ -22,6 +22,10 @@ function SetText({ setId }: { setId: number }) {
     return <Text style={{ color: "#fff" }}>Loading...</Text>;
   }
 
+  if (!set.selected) {
+    return null;
+  }
+
   return (
     <Text style={{ color: "#fff" }}>
       {set.weight} kg x {set.reps}
