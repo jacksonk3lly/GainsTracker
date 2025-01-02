@@ -4,11 +4,13 @@ import { Set } from "@/types/types";
 // import { db } from "@/app/(tabs)/index";
 import { get } from "react-native/Libraries/TurboModule/TurboModuleRegistry";
 
-const db: any = openDatabaseSync("SQLite.db");
+export const db: any = openDatabaseSync("SQLite.db");
 initDB();
 
 export function initDB() {
   db.execSync(`
+
+
 CREATE TABLE
     IF NOT EXISTS Workouts (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -50,10 +52,12 @@ export function addExercises() {
   try {
     db.execSync(`
     INSERT INTO Exercises (id) VALUES ("bench_press");
+    INSERT INTO Exercises (id) VALUES ("Dips");
+    INSERT INTO Exercises (id) VALUES ("weighted_pullups");
     INSERT INTO Exercises (id) VALUES ("squat");
     INSERT INTO Exercises (id) VALUES ("deadlift");
     INSERT INTO Exercises (id) VALUES ("overhead_press");
-    INSERT INTO Exercises (id) ALUES ("barbell_row");
+    INSERT INTO Exercises (id) VALUES ("barbell_row");
   `);
   } catch (e) {
     console.log("exercises probably allready there");
@@ -241,6 +245,7 @@ export function clearAllDatabases() {
   db.execSync(`
     DELETE FROM Workouts;
     DELETE FROM ExerciseUses;
+    Delete FROM Exercises;
     DELETE FROM Sets;
     DELETE FROM ActiveWorkout;
   `);

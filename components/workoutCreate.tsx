@@ -1,4 +1,11 @@
-import { View, StyleSheet, Button, Text, TextInput } from "react-native";
+import {
+  View,
+  StyleSheet,
+  Button,
+  Text,
+  TextInput,
+  KeyboardAvoidingView,
+} from "react-native";
 import { Alert } from "react-native";
 import { Exercise, Workout } from "@/types/types";
 import { useCallback, useEffect, useState } from "react";

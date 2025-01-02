@@ -5,6 +5,7 @@ import {
   ScrollView,
   Button,
   Alert,
+  KeyboardAvoidingView,
 } from "react-native";
 import data from "@/data/data.json";
 import { Exercise, Workout } from "@/types/types";

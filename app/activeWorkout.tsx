@@ -31,6 +31,8 @@ export default function activeWorkout() {
       contentContainerStyle={{ alignItems: "center" }}
     >
       <WorkoutCreate workoutId={getActiveWorkoutId()} />
+
+      <View style={{ height: 300, backgroundColor: "red" }}></View>
     </ScrollView>
   );
 }

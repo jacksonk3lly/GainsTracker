@@ -15,8 +15,8 @@ export default function WorkoutView({ workoutId }: Props) {
   useEffect(() => {
     async function fetchWorkoutTime() {
       const fetchedTime = await getWorkoutTime(workoutId);
-      // console.log(fetchWorkoutTime);
-      setTime(fetchedTime);
+      const date = new Date(fetchedTime);
+      setTime(date.toDateString());
     }
     fetchWorkoutTime();
   }, [time]);

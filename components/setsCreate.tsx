@@ -38,13 +38,19 @@ export default function ExerciseAdd({
   const [sets, setSets] = useState<Set[]>([]);
 
   function SetCreateComponent({ set }: { set: Set }) {
-    const [weight, setWeight] = useState(set.weight);
-    const [reps, setReps] = useState(set.reps);
+    const [weight, setWeight] = useState<string>(set.weight.toString());
+    const [reps, setReps] = useState<string>(set.reps.toString());
     const [isSelected, setSelection] = useState(set.selected);
 
     useEffect(() => {
-      set.reps = reps;
-      set.weight = weight;
+      if (reps === "") {
+        return;
+      }
+      if (weight === "") {
+        return;
+      }
+      set.reps = parseFloat(reps);
+      set.weight = parseFloat(weight);
       updateSet(set);
     }, [weight, reps]);
 
@@ -67,12 +73,12 @@ export default function ExerciseAdd({
         <View style={{ width: "40%" }}>
           <TextInput
             id="weight"
-            placeholder="Enter weight"
+            placeholder="Weight"
             style={styles.input}
-            value={weight ? weight.toString() : ""}
+            value={weight}
             placeholderTextColor="dimgray"
             keyboardType="numeric"
-            onChangeText={(text) => setWeight(Number(text))}
+            onChangeText={(text) => setWeight(text)}
           />
         </View>
 
@@ -80,11 +86,11 @@ export default function ExerciseAdd({
           <TextInput
             placeholderTextColor="dimgray"
             id="rep"
-            value={reps ? reps.toString() : ""}
+            value={reps}
             keyboardType="numeric"
-            placeholder="Enter Reps"
+            placeholder="Reps"
             style={styles.input}
-            onChangeText={(text) => setReps(Number(text))}
+            onChangeText={(text) => setReps(text)}
           />
         </View>
         <CustomCheckbox

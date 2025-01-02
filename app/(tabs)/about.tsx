@@ -8,8 +8,7 @@ import {
   Alert,
 } from "react-native";
 import { useState } from "react";
-import { db } from "./index";
-import { clearAllDatabases } from "@/db";
+import { db, clearAllDatabases } from "@/db";
 
 export default function AboutScreen() {
   const [sql, setSql] = useState("");
