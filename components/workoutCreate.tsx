@@ -1,7 +1,7 @@
 import { View, StyleSheet, Button, Text, TextInput } from "react-native";
 import { Alert } from "react-native";
 import { Exercise, Workout } from "@/types/types";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import ExerciseAdd from "@/components/setsCreate";
 import {
   newExerciseUse,
@@ -10,24 +10,32 @@ import {
   endActiveWorkout,
   getAllExerciseUses,
 } from "@/db";
-import { useRouter } from "expo-router";
+import { useFocusEffect, useRouter } from "expo-router";
 
 export default function WorkoutCreate({ workoutId }: { workoutId: number }) {
-  // foundExercises = getExerciseUses(workoutId);
   const router = useRouter();
 
   const [exercises, setExercises] = useState<number[]>(
     getExerciseUseIds(workoutId)
   );
 
-  const exerciseAdder = (exerciseId?: string) => {
-    const newExerciseUseId = newExerciseUse(workoutId, exerciseId);
-    setExercises([...exercises, newExerciseUseId]);
-  };
+  useEffect(() => {
+    setExercises(getExerciseUseIds(workoutId));
+  }, []);
 
-  // useEffect(() => {
-  //   setExercises(getExerciseUseIds(workoutId));
-  // }, [exercises]);
+  useFocusEffect(
+    useCallback(() => {
+      setExercises(getExerciseUseIds(workoutId));
+    }, [workoutId])
+  );
+
+  const exerciseAdder = () => {
+    console.log("adding to workout", workoutId);
+    router.push({
+      pathname: "/exerciseSelect",
+      params: { workoutId },
+    });
+  };
 
   const submitHandler = () => {
     Alert.alert(
@@ -52,36 +60,14 @@ export default function WorkoutCreate({ workoutId }: { workoutId: number }) {
 
   return (
     <View style={styles.container}>
-      {/* <Text style={styles.text}>Name</Text>
-      <TextInput
-        id="name"
-        placeholder="Enter Workout Name"
-        value={name}
-        onChangeText={setName}
-      />
-      <Text style={styles.text}>Date</Text>
-      <TextInput
-        id="date"
-        placeholder="Enter Date"
-        value={date}
-        onChangeText={setDate}
-      /> */}
       {exercises.map((exerciseUseId) => (
         <ExerciseAdd exerciseUseId={exerciseUseId} key={exerciseUseId} />
       ))}
       <View style={styles.buttonContainer}>
-        <Button
-          title="Add Exercise"
-          color={"#fff"}
-          onPress={() => exerciseAdder()}
-        />
+        <Button title="Add Exercise" color={"#fff"} onPress={exerciseAdder} />
       </View>
       <View style={styles.buttonContainer}>
-        <Button
-          title="Finish Workout"
-          color={"#fff"}
-          onPress={() => submitHandler()}
-        />
+        <Button title="Finish Workout" color={"#fff"} onPress={submitHandler} />
       </View>
     </View>
   );

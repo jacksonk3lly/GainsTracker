@@ -1,10 +1,64 @@
 import * as SQLite from "expo-sqlite";
-import { useSQLiteContext } from "expo-sqlite";
+import { useSQLiteContext, openDatabaseSync } from "expo-sqlite";
 import { Set } from "@/types/types";
-import { db } from "@/app/(tabs)/index";
+// import { db } from "@/app/(tabs)/index";
 import { get } from "react-native/Libraries/TurboModule/TurboModuleRegistry";
 
-// const db = useSQLiteContext();
+const db: any = openDatabaseSync("SQLite.db");
+initDB();
+
+export function initDB() {
+  db.execSync(`
+CREATE TABLE
+    IF NOT EXISTS Workouts (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        start_time DATETIME NOT NULL
+    );
+
+CREATE TABLE
+    IF NOT EXISTS Exercises (id TEXT PRIMARY KEY);
+
+CREATE TABLE
+    IF NOT EXISTS ExerciseUses (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        workout_id INTEGER NOT NULL,
+        exercise_id TEXT NOT NULL,
+        FOREIGN KEY (workout_id) REFERENCES Workouts (id),
+        FOREIGN KEY (exercise_id) REFERENCES Exercises (id)
+    );
+
+CREATE TABLE
+    IF NOT EXISTS Sets (
+        selected BOOLEAN NOT NULL DEFAULT TRUE,
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        exercise_use_id INTEGER NOT NULL,
+        reps INTEGER NOT NULL,
+        weight REAL NOT NULL,
+        FOREIGN KEY (exercise_use_id) REFERENCES ExerciseUses (id)
+    );
+
+CREATE TABLE
+    IF NOT EXISTS ActiveWorkout (
+        id INTEGER PRIMARY KEY CHECK (id = 1),
+        active_workout_id INTEGER NOT NULL,
+        FOREIGN KEY (active_workout_id) REFERENCES Workouts (id)
+    );
+`);
+}
+
+export function addExercises() {
+  try {
+    db.execSync(`
+    INSERT INTO Exercises (id) VALUES ("bench_press");
+    INSERT INTO Exercises (id) VALUES ("squat");
+    INSERT INTO Exercises (id) VALUES ("deadlift");
+    INSERT INTO Exercises (id) VALUES ("overhead_press");
+    INSERT INTO Exercises (id) ALUES ("barbell_row");
+  `);
+  } catch (e) {
+    console.log("exercises probably allready there");
+  }
+}
 
 export function newWorkout() {
   db.execSync(`
@@ -86,10 +140,39 @@ export function getMostRecentWorkoutId(): number {
   }
 }
 
-export function newExercise(id: string) {
+export function newExercise(workoutId: number, id: string) {
+  if (workoutId === -1) {
+    throw new Error("No workout ID provided");
+  }
   return db.execAsync(`
     INSERT INTO Exercises (id) VALUES (${id});
   `);
+}
+
+export function getNumberOfExerciseUses(exerciseId: string): number {
+  try {
+    const rows = db.getAllSync(`
+      SELECT id FROM ExerciseUses WHERE exercise_id = "${exerciseId}";
+    `);
+
+    return rows.length;
+  } catch (e) {
+    console.error("Error getting number of exercise uses:", e);
+    return -1;
+  }
+}
+
+export function getExerciseIds() {
+  try {
+    const rows: { id: string }[] = db.getAllSync(`
+      SELECT id FROM Exercises;
+    `);
+
+    return rows.map((row) => row.id);
+  } catch (e) {
+    console.error("Error getting exercise IDs:", e);
+    return [];
+  }
 }
 
 export function updateExerciseUseExerciseId(
@@ -105,9 +188,19 @@ export function updateExerciseUseExerciseId(
 
 export function newExerciseUse(workoutId: number, exerciseId?: string): number {
   if (exerciseId) {
-    db.execSync(`
-      INSERT INTO ExerciseUses (workout_id, exercise_id) VALUES (${workoutId}, ${exerciseId});
+    try {
+      db.execSync(`
+      INSERT INTO ExerciseUses (workout_id, exercise_id) VALUES (${workoutId}, "${exerciseId}");
     `);
+    } catch (e) {
+      console.log(
+        "Error inserting exercise use with workoutId ",
+        workoutId,
+        "and exerciseId",
+        exerciseId,
+        e
+      );
+    }
   } else {
     db.execSync(`
     INSERT INTO ExerciseUses (workout_id, exercise_id) VALUES (${workoutId}, "");
@@ -127,11 +220,11 @@ export function newSet(
   selected: boolean
 ) {
   db.execSync(`
-    INSERT INTO sets (selected, exercise_use_id, reps, weight) VALUES (${selected}, ${exerciseUseId}, ${reps}, ${weight});
+    INSERT INTO Sets (selected, exercise_use_id, reps, weight) VALUES (${selected}, ${exerciseUseId}, ${reps}, ${weight});
   `);
 
   const row = db.getFirstSync(`
-    SELECT selected, id, weight, reps FROM sets WHERE exercise_use_id = ${exerciseUseId} ORDER BY id DESC LIMIT 1;
+    SELECT selected, id, weight, reps FROM Sets WHERE exercise_use_id = ${exerciseUseId} ORDER BY id DESC LIMIT 1;
   `);
 
   let set: Set = {
@@ -148,7 +241,7 @@ export function clearAllDatabases() {
   db.execSync(`
     DELETE FROM Workouts;
     DELETE FROM ExerciseUses;
-    DELETE FROM sets;
+    DELETE FROM Sets;
     DELETE FROM ActiveWorkout;
   `);
 }
@@ -156,7 +249,7 @@ export function clearAllDatabases() {
 export function updateSet(set: Set) {
   try {
     db.execSync(`
-      UPDATE sets
+      UPDATE Sets
       SET reps = ${set.reps}, weight = ${set.weight}, selected = ${set.selected}
       WHERE id = ${set.id};
     `);
@@ -211,7 +304,7 @@ export function getExerciseUseIds(workoutId: number): number[] {
 export function getSetIds(exerciseUseId: number): number[] {
   try {
     const rows: { id: number }[] = db.getAllSync(`
-    SELECT id FROM sets WHERE exercise_use_id = ${exerciseUseId};
+    SELECT id FROM Sets WHERE exercise_use_id = ${exerciseUseId};
   `);
 
     return rows.map((row) => row.id);
@@ -239,7 +332,7 @@ export function getExerciseName(exerciseUseId: number): string {
 export function deleteSet(setId: number) {
   try {
     db.execSync(`
-    DELETE FROM sets WHERE id = ${setId};
+    DELETE FROM Sets WHERE id = ${setId};
   `);
   } catch (e) {
     console.error("Error deleting set:", e);
@@ -250,7 +343,7 @@ export async function getSet(setId: number): Promise<Set> {
   try {
     const row = await db.getFirstAsync(`
     SELECT reps, weight, selected
-    FROM sets
+    FROM Sets
     WHERE id = ${setId};
   `);
 

@@ -20,6 +20,12 @@ import { Set } from "@/types/types";
 import CustomCheckbox from "./CustomCheckbox";
 import { MaterialIcons } from "@expo/vector-icons";
 
+function niceText(text: string) {
+  text = text.replace(/_/g, " ");
+  text = text.replace(/\b\w/g, (char) => char.toUpperCase());
+  return text;
+}
+
 export default function ExerciseAdd({
   exerciseUseId,
 }: {
@@ -123,15 +129,7 @@ export default function ExerciseAdd({
 
   return (
     <View key={exerciseUseId} style={styles.container}>
-      <Text style={styles.text}>Name</Text>
-      <TextInput
-        style={styles.input}
-        placeholderTextColor="dimgray"
-        value={exerciseName}
-        id="name"
-        placeholder="Enter Exercise Name"
-        onChangeText={setExerciseName}
-      />
+      <Text style={styles.text}>{niceText(exerciseName)}</Text>
       {sets.map((set) => {
         return <SetCreateComponent set={set} key={set.id} />;
       })}
@@ -150,11 +148,14 @@ const styles = StyleSheet.create({
     margin: 20,
     borderRadius: 15,
     marginBottom: 20,
+    alignItems: "center",
     // flex: 1,
     width: "100%",
   },
   text: {
     color: "#fff",
+    textAlign: "center",
+    marginBottom: 15,
     fontSize: 24,
   },
   button: {

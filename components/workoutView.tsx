@@ -23,7 +23,6 @@ export default function WorkoutView({ workoutId }: Props) {
 
   const db = useEffect(() => {
     async function fetchExerciseUseIds() {
-      console.log("workout id in Exercise", workoutId);
       const ids = await getExerciseUseIds(workoutId);
       setExerciseUseIds(ids);
     }

@@ -29,7 +29,6 @@ export default function Create() {
     return <ExerciseAdd exerciseUseId={exerciseUseId} />;
   };
 
-  const db = useSQLiteContext();
   function newBlank() {
     try {
       printWorkouts();

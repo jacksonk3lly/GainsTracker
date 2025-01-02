@@ -1,15 +1,15 @@
-import { useContext, useEffect, useState } from "react";
+import { useCallback, useContext, useEffect, useState } from "react";
 import { Button, Text, View, StyleSheet, ScrollView } from "react-native";
-import { Link } from "expo-router";
+import { Link, useFocusEffect } from "expo-router";
 import Box from "@/components/exerciseView";
-import { getActiveWorkoutId, getWorkoutIds } from "@/db";
+import { addExercises, getActiveWorkoutId, getWorkoutIds, initDB } from "@/db";
 import WorkoutView from "@/components/workoutView";
-import { useSQLiteContext } from "expo-sqlite";
+import { openDatabaseSync, useSQLiteContext } from "expo-sqlite";
 
 let db: any = null;
 export default function Index() {
   const [workoutIds, setWorkoutIds] = useState<number[]>([]);
-  db = useSQLiteContext();
+  // db = useSQLiteContext();
 
   const fetchWorkoutIds = () => {
     let activeWorkoutId = getActiveWorkoutId();
@@ -21,8 +21,25 @@ export default function Index() {
   };
 
   useEffect(() => {
+    initDB();
     fetchWorkoutIds();
+    try {
+      addExercises();
+    } catch (e) {
+      console.log(e);
+    }
   }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchWorkoutIds();
+      try {
+        addExercises();
+      } catch (e) {
+        console.log(e);
+      }
+    }, [])
+  );
 
   return (
     <ScrollView
@@ -33,7 +50,6 @@ export default function Index() {
       {workoutIds.map((workoutId) => {
         return <WorkoutView key={workoutId} workoutId={workoutId} />;
       })}
-      <Button title="Refresh" onPress={fetchWorkoutIds} />
     </ScrollView>
   );
 }
