@@ -7,7 +7,6 @@ import {
   Alert,
   KeyboardAvoidingView,
 } from "react-native";
-import data from "@/data/data.json";
 import { Exercise, Workout } from "@/types/types";
 import WorkoutCreate from "@/components/workoutCreate";
 import ExerciseAdd from "@/components/setsCreate";
@@ -15,6 +14,7 @@ import { Link, Stack, useRouter } from "expo-router";
 import {
   activeWorkoutExists,
   newActiveWorkout,
+  createWorkoutBasedOnProgram,
   newWorkout,
   printWorkouts,
 } from "@/db";
@@ -45,6 +45,18 @@ export default function Create() {
     } catch (e) {
       console.error("Error checking active workout:", e);
     }
+  }
+
+  function new5x5() {
+    const exists = activeWorkoutExists();
+    if (exists) {
+      Alert.alert(
+        "There is already an active workout. Please finish it before starting a new one."
+      );
+      return;
+    }
+    createWorkoutBasedOnProgram("5x5");
+    router.navigate("/activeWorkout");
   }
 
   function resumeWorkout() {
@@ -83,7 +95,7 @@ export default function Create() {
           <Button
             title="New 5x5 Workout"
             color={"#fff"}
-            onPress={() => Alert.alert("not implemented")}
+            onPress={new5x5}
           ></Button>
         </View>
       </View>

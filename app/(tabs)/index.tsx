@@ -2,7 +2,14 @@ import { useCallback, useContext, useEffect, useState } from "react";
 import { Button, Text, View, StyleSheet, ScrollView } from "react-native";
 import { Link, useFocusEffect } from "expo-router";
 import Box from "@/components/exerciseView";
-import { addExercises, getActiveWorkoutId, getWorkoutIds, initDB } from "@/db";
+import {
+  addExercises,
+  dropTables,
+  getActiveWorkoutId,
+  getWorkoutIds,
+  initDB,
+  setUp5x5,
+} from "@/db";
 import WorkoutView from "@/components/workoutView";
 import { openDatabaseSync, useSQLiteContext } from "expo-sqlite";
 
@@ -25,6 +32,7 @@ export default function Index() {
     fetchWorkoutIds();
     try {
       addExercises();
+      setUp5x5();
     } catch (e) {
       console.log(e);
     }
@@ -34,7 +42,6 @@ export default function Index() {
     useCallback(() => {
       fetchWorkoutIds();
       try {
-        addExercises();
       } catch (e) {
         console.log(e);
       }
@@ -50,6 +57,7 @@ export default function Index() {
       {workoutIds.map((workoutId) => {
         return <WorkoutView key={workoutId} workoutId={workoutId} />;
       })}
+      <View style={{ height: 80 }}></View>
     </ScrollView>
   );
 }

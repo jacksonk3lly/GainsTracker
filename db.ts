@@ -4,17 +4,17 @@ import { Set } from "@/types/types";
 // import { db } from "@/app/(tabs)/index";
 import { get } from "react-native/Libraries/TurboModule/TurboModuleRegistry";
 
-export const db: any = openDatabaseSync("SQLite.db");
+export const db: SQLite.SQLiteDatabase = openDatabaseSync("SQLite.db");
 initDB();
 
 export function initDB() {
   db.execSync(`
-
-
 CREATE TABLE
     IF NOT EXISTS Workouts (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        start_time DATETIME NOT NULL
+        start_time DATETIME NOT NULL,
+        plan_id TEXT DEFAULT NULL,
+        FOREIGN KEY (plan_id) REFERENCES WorkoutPlan (id)
     );
 
 CREATE TABLE
@@ -45,7 +45,81 @@ CREATE TABLE
         active_workout_id INTEGER NOT NULL,
         FOREIGN KEY (active_workout_id) REFERENCES Workouts (id)
     );
+
+CREATE TABLE
+    IF NOT EXISTS WorkoutPlan (
+        order_number INTEGER ,
+        name TEXT NOT NULL,
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        program_id TEXT NOT NULL,
+        FOREIGN KEY (program_id) REFERENCES PROGRAM (id)
+    );
+
+CREATE TABLE
+    IF NOT EXISTS PROGRAM (id TEXT PRIMARY KEY);
+
+
+CREATE TABLE
+    IF NOT EXISTS ExercisePlan (
+        order_number INTEGER ,
+        exercise_id TEXT NOT NULL,
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        increment REAL DEFAULT 2.5,
+        workout_plan_id INTEGER NOT NULL,
+        FOREIGN KEY (workout_plan_id) REFERENCES WorkoutPlan (id)
+        FOREIGN KEY (exercise_id) REFERENCES Exercises (id)
+    );
 `);
+}
+
+export function dropTables() {
+  db.execSync(`
+    DROP TABLE Workouts;
+    DROP TABLE Exercises;
+    DROP TABLE ExerciseUses;
+    DROP TABLE Sets;
+    DROP TABLE ActiveWorkout;
+    DROP TABLE WorkoutPlan;
+    DROP TABLE PROGRAM;
+    DROP TABLE ExercisePlan;
+  `);
+}
+
+export function setUp5x5() {
+  try {
+    db.execSync(`
+    INSERT INTO PROGRAM (id) VALUES ("5x5");
+    INSERT INTO WorkoutPlan (order_number,program_id,name) VALUES (0,"5x5","Workout A");
+    INSERT INTO WorkoutPlan (order_number,program_id,name) VALUES (1,"5x5","Workout B");
+
+  `);
+
+    const workoutAId = (
+      db.getFirstSync(`
+      SELECT id FROM WorkoutPlan WHERE program_id = "5x5" AND name = "Workout A"
+    `) as { id: number }
+    ).id;
+
+    db.execSync(`
+      INSERT INTO ExercisePlan (order_number,workout_plan_id, exercise_id) VALUES (0,${workoutAId},"squat");
+      INSERT INTO ExercisePlan (order_number,workout_plan_id, exercise_id) VALUES (1,${workoutAId},"bench_press");
+      INSERT INTO ExercisePlan (order_number,workout_plan_id, exercise_id) VALUES (2,${workoutAId},"barbell_row");
+    `);
+
+    const workoutBId = (
+      db.getFirstSync(`
+      SELECT id FROM WorkoutPlan WHERE program_id = "5x5" AND name = "Workout B"
+    `) as { id: number }
+    ).id;
+
+    db.execSync(`
+      INSERT INTO ExercisePlan (order_number,workout_plan_id, exercise_id) VALUES (0,${workoutBId},"squat");
+      INSERT INTO ExercisePlan (order_number,workout_plan_id, exercise_id) VALUES (1,${workoutBId},"overhead_press");
+      INSERT INTO ExercisePlan (order_number,workout_plan_id, exercise_id,increment) VALUES (2,${workoutBId},"deadlift",5);
+    `);
+  } catch (e) {
+    console.log("programs probably already there");
+  }
 }
 
 export function addExercises() {
@@ -61,6 +135,132 @@ export function addExercises() {
   `);
   } catch (e) {
     console.log("exercises probably allready there");
+  }
+}
+
+export function createWorkoutBasedOnProgram(programId: string) {
+  try {
+    // Get the WorkoutPlans for the program
+    const workoutPlans = db.getAllSync(`
+      SELECT id FROM WorkoutPlan WHERE program_id = "${programId}" ORDER BY order_number;
+    `) as { id: number }[];
+
+    console.log("workoutPlans", workoutPlans);
+
+    if (workoutPlans.length === 0) {
+      throw new Error(`No WorkoutPlans found for program_id ${programId}`);
+    }
+
+    // Get the most recent workout referencing the program
+    const mostRecentWorkout = db.getFirstSync(`
+      SELECT Workouts.plan_id, WorkoutPlan.order_number FROM Workouts
+      JOIN WorkoutPlan ON Workouts.plan_id = WorkoutPlan.id
+      WHERE WorkoutPlan.program_id = "${programId}"
+      ORDER BY Workouts.start_time DESC LIMIT 1
+    `) as { order_number: number; plan_id: number } | null;
+
+    // Determine the next WorkoutPlan id
+    let nextPlanId;
+    if (!mostRecentWorkout) {
+      nextPlanId = workoutPlans[0].id; // Start with the first plan if no previous workout exists
+    } else {
+      const last_orderNumber = mostRecentWorkout.order_number;
+      const new_order_number = (last_orderNumber + 1) % workoutPlans.length;
+      nextPlanId =
+        workoutPlans[(last_orderNumber + 1) % workoutPlans.length].id; // Cycle to the next plan
+    }
+
+    // Create the new workout
+    const startTime = new Date().toISOString();
+    db.execSync(`
+      INSERT INTO Workouts (start_time, plan_id) VALUES ("${startTime}", ${nextPlanId})
+    `);
+
+    let newWorkoutId = getMostRecentWorkoutId();
+    db.execSync(`
+      INSERT INTO ActiveWorkout (active_workout_id) VALUES (${newWorkoutId});
+    `);
+
+    getExercisePlanIds(nextPlanId).forEach((exercisePlanId) => {
+      let weight = 0;
+      try {
+        const row = db.getFirstSync(`
+        SELECT id 
+        FROM ExerciseUses 
+        WHERE exercise_id = "${getExerciseIdFromPlan(exercisePlanId)}"
+        ORDER BY id DESC LIMIT 1
+      `) as { id: number } | null;
+
+        if (!row) {
+          throw new Error("No Old ExerciseUses found for this ExercisePlan");
+        }
+
+        const lastUseOfPlanExerciseUseId = row.id;
+
+        console.log("lastUseOfPlanExerciseUseId", lastUseOfPlanExerciseUseId);
+
+        const lowestWeight = db.getFirstSync(`
+        SELECT MIN(weight) as min_weight 
+        FROM Sets 
+        WHERE exercise_use_id = ${lastUseOfPlanExerciseUseId} AND
+        SELECTED = TRUE;
+      `) as { min_weight: number } | null;
+
+        const increment = getIncrementFromPlan(exercisePlanId);
+        console.log("increment", increment);
+        weight = lowestWeight ? lowestWeight.min_weight + increment : 0;
+      } catch (e) {
+        console.log("FirstTime UsingExercise", e);
+      }
+
+      const exerciseUse_id = newExerciseUse(
+        newWorkoutId,
+        getExerciseIdFromPlan(exercisePlanId)
+      );
+      for (let i = 0; i < 5; i++) {
+        newSet(exerciseUse_id, 5, weight, false);
+      }
+    });
+  } catch (error) {
+    console.error("Error creating workout:", error);
+    return null;
+  }
+}
+
+export function getIncrementFromPlan(exercisePlanId: number): number {
+  const row = db.getFirstSync(
+    `SELECT increment FROM ExercisePlan WHERE id = ${exercisePlanId}`
+  ) as { increment: number } | null;
+
+  if (!row) {
+    throw new Error(`No ExercisePlan found with id ${exercisePlanId}`);
+  }
+
+  return row.increment;
+}
+
+function getExerciseIdFromPlan(exercisePlanId: number): string {
+  const row = db.getFirstSync(
+    `SELECT exercise_id FROM ExercisePlan WHERE id = ${exercisePlanId}`
+  ) as { exercise_id: string } | null;
+
+  if (!row) {
+    throw new Error(`No ExercisePlan found with id ${exercisePlanId}`);
+  }
+
+  return row.exercise_id;
+}
+
+export function getExercisePlanIds(workoutPlanId: number): number[] {
+  try {
+    const rows: { id: number }[] = db.getAllSync(`
+    SELECT id FROM ExercisePlan WHERE workout_plan_id = ${workoutPlanId};
+  `);
+
+    return rows.map((row) => row.id);
+  } catch (e) {
+    console.error("Error getting exercise plan IDs:", e);
+    return [];
   }
 }
 
@@ -99,7 +299,7 @@ export function getActiveWorkoutId(): number {
   try {
     const row = db.getFirstSync(
       `SELECT active_workout_id FROM ActiveWorkout LIMIT 1;`
-    );
+    ) as { active_workout_id: number } | null;
     if (!row) {
       return -1;
     }
@@ -136,7 +336,10 @@ export function getMostRecentWorkoutId(): number {
   try {
     const row = db.getFirstSync(
       `SELECT id FROM Workouts ORDER BY start_time DESC LIMIT 1;`
-    );
+    ) as { id: number } | null;
+    if (!row) {
+      return -1;
+    }
     return row.id;
   } catch (e) {
     console.error("Error getting most recent workout ID:", e);
@@ -213,7 +416,10 @@ export function newExerciseUse(workoutId: number, exerciseId?: string): number {
 
   const row = db.getFirstSync(`
     SELECT id FROM ExerciseUses WHERE workout_id = ${workoutId} ORDER BY id DESC LIMIT 1;
-  `);
+  `) as { id: number } | null;
+  if (!row) {
+    throw new Error("No ExerciseUses found");
+  }
   return row.id;
 }
 
@@ -229,7 +435,10 @@ export function newSet(
 
   const row = db.getFirstSync(`
     SELECT selected, id, weight, reps FROM Sets WHERE exercise_use_id = ${exerciseUseId} ORDER BY id DESC LIMIT 1;
-  `);
+  `) as { selected: boolean; id: number; weight: number; reps: number } | null;
+  if (!row) {
+    throw new Error("No Sets found");
+  }
 
   let set: Set = {
     id: row.id,
@@ -264,16 +473,16 @@ export function updateSet(set: Set) {
   }
 }
 
-export async function getExerciseUses(workoutId: number) {
-  let rows: { id: number; exercise_id: string }[] = db.execAsync(`
-    SELECT * FROM ExerciseUses WHERE workout_id = ${workoutId};
-  `);
+// export async function getExerciseUses(workoutId: number) {
+//   let rows: { id: number; exercise_id: string }[] = db.execAsync(`
+//     SELECT * FROM ExerciseUses WHERE workout_id = ${workoutId};
+//   `);
 
-  return rows;
-}
+//   return rows;
+// }
 
-export async function getAllExerciseUses() {
-  const rows: { id: number }[] = db.execSync(`
+export function getAllExerciseUses() {
+  const rows: { id: number }[] = db.getAllSync(`
     SELECT id FROM ExerciseUses;
   `);
 
@@ -325,7 +534,7 @@ export function getExerciseName(exerciseUseId: number): string {
     SELECT exercise_id 
     FROM ExerciseUses 
     WHERE id = ${exerciseUseId};
-  `);
+  `) as { exercise_id: string } | null;
 
     return row ? row.exercise_id : "";
   } catch (e) {
@@ -346,11 +555,11 @@ export function deleteSet(setId: number) {
 
 export async function getSet(setId: number): Promise<Set> {
   try {
-    const row = await db.getFirstAsync(`
+    const row = (await db.getFirstAsync(`
     SELECT reps, weight, selected
     FROM Sets
     WHERE id = ${setId};
-  `);
+  `)) as { reps: number; weight: number; selected: boolean } | null;
 
     if (!row) {
       throw new Error("Set not found");
@@ -372,11 +581,11 @@ export async function getSet(setId: number): Promise<Set> {
 
 export async function getWorkoutTime(workoutId: number): Promise<string> {
   try {
-    const row = await db.getFirstAsync(`
+    const row = (await db.getFirstAsync(`
       SELECT start_time
       FROM Workouts
       WHERE id = ${workoutId};
-    `);
+    `)) as { start_time: string } | null;
 
     return row?.start_time ?? "";
   } catch (e) {
