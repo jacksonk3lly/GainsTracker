@@ -60,6 +60,7 @@ export default function exerciseSelect() {
   }
 
   const [exerciseIds, setExerciseIds] = useState(getExerciseIds());
+  console.log(exerciseIds);
 
   return (
     <ScrollView

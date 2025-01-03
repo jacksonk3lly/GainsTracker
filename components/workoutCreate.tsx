@@ -13,7 +13,6 @@ import ExerciseAdd from "@/components/setsCreate";
 import {
   newExerciseUse,
   getExerciseUseIds,
-  getExerciseUses,
   endActiveWorkout,
   getAllExerciseUses,
 } from "@/db";

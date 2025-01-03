@@ -171,9 +171,8 @@ export function createWorkoutBasedOnProgram(programId: string) {
     }
 
     // Create the new workout
-    const startTime = new Date().toISOString();
     db.execSync(`
-      INSERT INTO Workouts (start_time, plan_id) VALUES ("${startTime}", ${nextPlanId})
+      INSERT INTO Workouts (start_time, plan_id) VALUES (CURRENT_TIMESTAMP, ${nextPlanId})
     `);
 
     let newWorkoutId = getMostRecentWorkoutId();
@@ -324,6 +323,7 @@ export function newActiveWorkout() {
   try {
     newWorkout();
     let id = getMostRecentWorkoutId();
+    console.log("newActiveWorkout id", id);
     db.execSync(`
       INSERT INTO ActiveWorkout (active_workout_id) VALUES (${id});
     `);
