@@ -6,6 +6,7 @@ import {
   Button,
   Alert,
   KeyboardAvoidingView,
+  Platform,
 } from "react-native";
 import { Exercise, Workout } from "@/types/types";
 import WorkoutCreate from "@/components/workoutCreate";
@@ -19,6 +20,8 @@ import {
   printWorkouts,
 } from "@/db";
 import { useSQLiteContext } from "expo-sqlite";
+import {buttonStyle} from "@/assets/buttonstyle";
+
 
 type RootStackParamList = {
   NewWorkoutOverlay: undefined;
@@ -79,7 +82,7 @@ export default function Create() {
         <View style={styles.buttonContainer}>
           <Button
             title="Resume Workout"
-            color={"#fff"}
+            color={buttonStyle.selectors.color}
             onPress={resumeWorkout}
           ></Button>
         </View>
@@ -88,13 +91,13 @@ export default function Create() {
           {/* <Link href="/activeWorkout" style={styles.button}>
             New Blank Workout
           </Link> */}
-          <Button title="New Blank Workout" onPress={newBlank} color={"#fff"} />
+          <Button title="New Blank Workout" onPress={newBlank} color={buttonStyle.selectors.color} />
         </View>
 
         <View style={styles.buttonContainer}>
           <Button
             title="New 5x5 Workout"
-            color={"#fff"}
+            color={buttonStyle.selectors.color}
             onPress={new5x5}
           ></Button>
         </View>

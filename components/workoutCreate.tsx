@@ -17,6 +17,8 @@ import {
   getAllExerciseUses,
 } from "@/db";
 import { useFocusEffect, useRouter } from "expo-router";
+import {buttonStyle} from "@/assets/buttonstyle";
+
 
 export default function WorkoutCreate({ workoutId }: { workoutId: number }) {
   const router = useRouter();
@@ -70,10 +72,10 @@ export default function WorkoutCreate({ workoutId }: { workoutId: number }) {
         <ExerciseAdd exerciseUseId={exerciseUseId} key={exerciseUseId} />
       ))}
       <View style={styles.buttonContainer}>
-        <Button title="Add Exercise" color={"#fff"} onPress={exerciseAdder} />
+        <Button title="Add Exercise" color={buttonStyle.selectors.color} onPress={exerciseAdder} />
       </View>
       <View style={styles.buttonContainer}>
-        <Button title="Finish Workout" color={"#fff"} onPress={submitHandler} />
+        <Button title="Finish Workout" color={buttonStyle.selectors.color} onPress={submitHandler} />
       </View>
     </View>
   );

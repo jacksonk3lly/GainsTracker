@@ -19,6 +19,8 @@ import {
 import { Set } from "@/types/types";
 import CustomCheckbox from "./CustomCheckbox";
 import { MaterialIcons } from "@expo/vector-icons";
+import {buttonStyle} from "@/assets/buttonstyle";
+
 
 function niceText(text: string) {
   text = text.replace(/_/g, " ");
@@ -140,7 +142,7 @@ export default function ExerciseAdd({
         return <SetCreateComponent set={set} key={set.id} />;
       })}
       <View style={styles.buttonContainer}>
-        <Button title="Add Set" color={"#fff"} onPress={() => setAdd()} />
+        <Button title="Add Set" color={buttonStyle.selectors.color} onPress={() => setAdd()} />
       </View>
     </View>
   );

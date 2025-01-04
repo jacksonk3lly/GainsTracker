@@ -2,9 +2,11 @@ import { Stack, useFocusEffect, useRouter } from "expo-router";
 import { useFonts } from "expo-font";
 import { Tabs } from "expo-router";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { View, Text, StyleSheet, Alert, Button } from "react-native";
+import { View, Text, StyleSheet, Alert, Button, Platform } from "react-native";
 import React, { useCallback, useState } from "react";
 import { activeWorkoutExists } from "@/db";
+import {buttonStyle} from "@/assets/buttonstyle";
+
 
 export default function TabLayout() {
   const router = useRouter();
@@ -51,9 +53,12 @@ export default function TabLayout() {
           tabBarActiveTintColor: "green",
           headerTitleStyle: {
             fontFamily: fontsLoaded ? "SedgwickAveDisplay-Regular" : "System",
-            fontSize: 30, // Add your desired font size here
-            // color: "green",
-            // height: 100,
+            fontSize: 30,
+            ...Platform.select({
+              android: {
+                height: 120,
+              },
+            }),
           },
         }}
       >
@@ -105,7 +110,7 @@ export default function TabLayout() {
         <View style={styles.floatingButton}>
           <Button
             title="Resume Workout"
-            color="#fff"
+            color={buttonStyle.selectors.color}
             onPress={resumeWorkout}
           ></Button>
         </View>
