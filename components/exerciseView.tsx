@@ -27,7 +27,7 @@ function SetText({ setId }: { setId: number }) {
   }
 
   return (
-    <Text style={{ color: "#fff" }}>
+    <Text style={{ color: "#fff", marginBottom: 5 }}>
       {set.weight} kg x {set.reps}
     </Text>
   );

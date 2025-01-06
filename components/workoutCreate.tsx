@@ -15,6 +15,7 @@ import {
   getExerciseUseIds,
   endActiveWorkout,
   getAllExerciseUses,
+  deleteExerciseUse,
 } from "@/db";
 import { useFocusEffect, useRouter } from "expo-router";
 import {buttonStyle} from "@/assets/buttonstyle";
@@ -66,10 +67,19 @@ export default function WorkoutCreate({ workoutId }: { workoutId: number }) {
     );
   };
 
+  function removeExerciseUse(exerciseUseId: number) {
+    deleteExerciseUse(exerciseUseId);
+    setExercises((prevExercises) => prevExercises.filter((id) => id !== exerciseUseId));
+  }
+
   return (
     <View style={styles.container}>
       {exercises.map((exerciseUseId) => (
-        <ExerciseAdd exerciseUseId={exerciseUseId} key={exerciseUseId} />
+        <ExerciseAdd
+          exerciseUseId={exerciseUseId}
+          key={exerciseUseId}
+          onRemove={() => removeExerciseUse(exerciseUseId)}
+        />
       ))}
       <View style={styles.buttonContainer}>
         <Button title="Add Exercise" color={buttonStyle.selectors.color} onPress={exerciseAdder} />
