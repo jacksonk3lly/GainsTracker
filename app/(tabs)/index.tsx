@@ -16,6 +16,7 @@ import { openDatabaseSync, useSQLiteContext } from "expo-sqlite";
 let db: any = null;
 export default function Index() {
   const [workoutIds, setWorkoutIds] = useState<number[]>([]);
+  const [refreshKey, setRefreshKey] = useState(0); // Add refreshKey state
   // db = useSQLiteContext();
 
   const fetchWorkoutIds = () => {
@@ -25,6 +26,11 @@ export default function Index() {
     if (activeWorkoutId > 0) {
       setWorkoutIds(ids.filter((id) => id !== activeWorkoutId));
     }
+    setRefreshKey((prevKey) => prevKey + 1); // Update refreshKey to force re-render
+  };
+
+  const refreshWorkouts = () => {
+    fetchWorkoutIds();
   };
 
   useEffect(() => {
@@ -40,22 +46,25 @@ export default function Index() {
 
   useFocusEffect(
     useCallback(() => {
+      setWorkoutIds([]); // Reset workoutIds to force re-render
       fetchWorkoutIds();
+      setRefreshKey((prevKey) => prevKey + 1); // Update refreshKey to force re-render
       try {
       } catch (e) {
         console.log(e);
       }
-    }, [])
+    }, []) // Add setWorkoutIds as a dependency
   );
 
   return (
     <ScrollView
+      key={refreshKey} // Use refreshKey to force re-render
       showsVerticalScrollIndicator={false}
       style={styles.container}
       contentContainerStyle={{ alignItems: "center" }}
     >
       {workoutIds.map((workoutId) => {
-        return <WorkoutView key={workoutId} workoutId={workoutId} />;
+        return <WorkoutView key={workoutId} workoutId={workoutId} refreshWorkouts={refreshWorkouts} />;
       })}
       <View style={{ height: 80 }}></View>
     </ScrollView>

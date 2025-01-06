@@ -269,6 +269,16 @@ export function newWorkout() {
   `);
 }
 
+export function deleteWorkout(workoutId: number) {
+  try {
+    db.execSync(`
+    DELETE FROM Workouts WHERE id = ${workoutId};
+  `);
+  } catch (e) {
+    console.error("Error deleting workout:", e);
+  }
+}
+
 export function printWorkouts() {
   try {
     const rows = db.getAllSync("SELECT * FROM Workouts;");
@@ -391,6 +401,16 @@ export function updateExerciseUseExerciseId(
     SET exercise_id = "${exerciseId}"
     WHERE id = ${exerciseUseId};
   `);
+}
+
+export function deleteExerciseUse(exerciseUseId: number) {
+  try {
+    db.execSync(`
+    DELETE FROM ExerciseUses WHERE id = ${exerciseUseId};
+  `);
+  } catch (e) {
+    console.error("Error deleting exercise use:", e);
+  }
 }
 
 export function newExerciseUse(workoutId: number, exerciseId?: string): number {
