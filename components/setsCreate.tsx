@@ -20,8 +20,8 @@ import {
 import { Set } from "@/types/types";
 import CustomCheckbox from "./CustomCheckbox";
 import { MaterialIcons } from "@expo/vector-icons";
-import {buttonStyle} from "@/assets/buttonstyle";
-
+import { buttonStyle } from "@/assets/buttonstyle";
+import { router } from "expo-router";
 
 function niceText(text: string) {
   text = text.replace(/_/g, " ");
@@ -144,12 +144,24 @@ export default function ExerciseAdd({
     updateExerciseUseExerciseId(exerciseUseId, exerciseName);
   }, [exerciseName]);
 
+  function onNamePress() {
+    router.push({
+      pathname: "./exerciseHistory",
+      params: { exerciseId: exerciseUseId },
+    });
+  }
+
   return (
     <View key={exerciseUseId} style={styles.container}>
       <View key={"binButton"} style={styles.sideBySide}>
-        <Text style={styles.text}>{niceText(exerciseName)}</Text>
-        <TouchableOpacity style = {styles.deleteButton} onPress={removeExerciseUse}>
-          <View >
+        <TouchableOpacity onPress={onNamePress}>
+          <Text style={styles.text}>{niceText(exerciseName)}</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.deleteButton}
+          onPress={removeExerciseUse}
+        >
+          <View>
             <MaterialIcons name="delete" size={27} color="black" />
           </View>
         </TouchableOpacity>
@@ -159,7 +171,11 @@ export default function ExerciseAdd({
       })}
 
       <View style={styles.buttonContainer}>
-        <Button title="Add Set" color={buttonStyle.selectors.color} onPress={() => setAdd()} />
+        <Button
+          title="Add Set"
+          color={buttonStyle.selectors.color}
+          onPress={() => setAdd()}
+        />
       </View>
     </View>
   );

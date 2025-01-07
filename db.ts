@@ -555,6 +555,19 @@ export function getExerciseUseIds(workoutId: number): number[] {
   }
 }
 
+export function getExerciseUseIdsOfExercise(exerciseId: string): number[] {
+  try {
+    const rows: { id: number }[] = db.getAllSync(`
+    SELECT id FROM ExerciseUses WHERE exercise_id = "${exerciseId}";
+  `);
+
+    return rows.map((row) => row.id);
+  } catch (e) {
+    console.error("Error getting exercise use IDs:", e);
+    return [];
+  }
+}
+
 export function getSetIds(exerciseUseId: number): number[] {
   try {
     const rows: { id: number }[] = db.getAllSync(`
