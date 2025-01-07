@@ -16,6 +16,7 @@ import {
   endActiveWorkout,
   getAllExerciseUses,
   deleteExerciseUse,
+  deleteUncheckedSets,
 } from "@/db";
 import { useFocusEffect, useRouter } from "expo-router";
 import {buttonStyle} from "@/assets/buttonstyle";
@@ -59,6 +60,7 @@ export default function WorkoutCreate({ workoutId }: { workoutId: number }) {
           text: "OK",
           onPress: () => {
             endActiveWorkout();
+            deleteUncheckedSets(workoutId);
             router.back();
           },
         },

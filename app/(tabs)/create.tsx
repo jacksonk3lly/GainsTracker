@@ -29,9 +29,6 @@ type RootStackParamList = {
 
 export default function Create() {
   const router = useRouter();
-  const exerciseAdder = (exerciseUseId: number) => {
-    return <ExerciseAdd exerciseUseId={exerciseUseId} />;
-  };
 
   function newBlank() {
     try {

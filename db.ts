@@ -269,6 +269,13 @@ export function newWorkout() {
   `);
 }
 
+export function deleteUncheckedSets(workoutId: number) {
+  getExerciseUseIds(workoutId).forEach((exerciseUseId) => {
+    db.execSync(`DELETE FROM Sets WHERE selected = FALSE AND exercise_use_id = ${exerciseUseId};`);
+  });
+
+}
+
 export function deleteWorkout(workoutId: number) {
   try {
     db.execSync(`
