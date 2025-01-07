@@ -226,6 +226,12 @@ export function createWorkoutBasedOnProgram(programId: string) {
   }
 }
 
+export function deleteExerciseUsesWithNoWorkout() {
+  db.execSync(`
+    DELETE FROM ExerciseUses WHERE workout_id IS NULL OR workout_id NOT IN (SELECT id FROM Workouts);
+  `);
+}
+
 export function getIncrementFromPlan(exercisePlanId: number): number {
   const row = db.getFirstSync(
     `SELECT increment FROM ExercisePlan WHERE id = ${exercisePlanId}`
@@ -273,7 +279,14 @@ export function deleteUncheckedSets(workoutId: number) {
   getExerciseUseIds(workoutId).forEach((exerciseUseId) => {
     db.execSync(`DELETE FROM Sets WHERE selected = FALSE AND exercise_use_id = ${exerciseUseId};`);
   });
+}
 
+export function deleteExerciseUsesWithNoSets(workoutId:number){
+  getExerciseUseIds(workoutId).forEach((exerciseUseId) => {
+    if(getSetIds(exerciseUseId).length === 0){
+      deleteExerciseUse(exerciseUseId);
+    }
+  });
 }
 
 export function deleteWorkout(workoutId: number) {
