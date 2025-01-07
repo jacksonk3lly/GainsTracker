@@ -15,6 +15,9 @@ import {
   getExerciseUseIds,
   endActiveWorkout,
   getAllExerciseUses,
+  deleteExerciseUse,
+  deleteUncheckedSets,
+  deleteExerciseUsesWithNoSets,
 } from "@/db";
 import { useFocusEffect, useRouter } from "expo-router";
 import {buttonStyle} from "@/assets/buttonstyle";
@@ -58,6 +61,8 @@ export default function WorkoutCreate({ workoutId }: { workoutId: number }) {
           text: "OK",
           onPress: () => {
             endActiveWorkout();
+            deleteUncheckedSets(workoutId);
+            deleteExerciseUsesWithNoSets(workoutId);
             router.back();
           },
         },
@@ -66,10 +71,19 @@ export default function WorkoutCreate({ workoutId }: { workoutId: number }) {
     );
   };
 
+  function removeExerciseUse(exerciseUseId: number) {
+    deleteExerciseUse(exerciseUseId);
+    setExercises((prevExercises) => prevExercises.filter((id) => id !== exerciseUseId));
+  }
+
   return (
     <View style={styles.container}>
       {exercises.map((exerciseUseId) => (
-        <ExerciseAdd exerciseUseId={exerciseUseId} key={exerciseUseId} />
+        <ExerciseAdd
+          exerciseUseId={exerciseUseId}
+          key={exerciseUseId}
+          onRemove={() => removeExerciseUse(exerciseUseId)}
+        />
       ))}
       <View style={styles.buttonContainer}>
         <Button title="Add Exercise" color={buttonStyle.selectors.color} onPress={exerciseAdder} />
@@ -85,8 +99,9 @@ const styles = StyleSheet.create({
   container: {
     display: "flex",
     flexDirection: "column",
-    backgroundColor: "dimgray",
-    width: "90%",
+    // backgroundColor: "dimgray",
+    
+    width: "100%",
     borderRadius: 15,
     alignItems: "center",
     justifyContent: "center",

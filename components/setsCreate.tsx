@@ -15,12 +15,13 @@ import {
   updateExerciseUseExerciseId,
   deleteSet,
   updateSet,
+  deleteExerciseUse,
 } from "@/db";
 import { Set } from "@/types/types";
 import CustomCheckbox from "./CustomCheckbox";
 import { MaterialIcons } from "@expo/vector-icons";
-import {buttonStyle} from "@/assets/buttonstyle";
-
+import { buttonStyle } from "@/assets/buttonstyle";
+import { router } from "expo-router";
 
 function niceText(text: string) {
   text = text.replace(/_/g, " ");
@@ -30,14 +31,22 @@ function niceText(text: string) {
 
 export default function ExerciseAdd({
   exerciseUseId,
+  onRemove,
 }: {
   exerciseUseId: number;
+  onRemove: () => void;
 }) {
   const [exerciseName, setExerciseName] = useState(
     getExerciseName(exerciseUseId)
   );
 
   const [sets, setSets] = useState<Set[]>([]);
+
+  function removeExerciseUse() {
+    deleteExerciseUse(exerciseUseId);
+    setSets([]);
+    onRemove();
+  }
 
   function SetCreateComponent({ set }: { set: Set }) {
     const [weight, setWeight] = useState<string>(set.weight.toString());
@@ -135,35 +144,67 @@ export default function ExerciseAdd({
     updateExerciseUseExerciseId(exerciseUseId, exerciseName);
   }, [exerciseName]);
 
+  function onNamePress() {
+    router.push({
+      pathname: "./exerciseHistory",
+      params: { exerciseId: exerciseUseId },
+    });
+  }
+
   return (
     <View key={exerciseUseId} style={styles.container}>
-      <Text style={styles.text}>{niceText(exerciseName)}</Text>
+      <View key={"binButton"} style={styles.sideBySide}>
+        <TouchableOpacity onPress={onNamePress}>
+          <Text style={styles.text}>{niceText(exerciseName)}</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.deleteButton}
+          onPress={removeExerciseUse}
+        >
+          <View>
+            <MaterialIcons name="delete" size={27} color="black" />
+          </View>
+        </TouchableOpacity>
+      </View>
       {sets.map((set) => {
         return <SetCreateComponent set={set} key={set.id} />;
       })}
+
       <View style={styles.buttonContainer}>
-        <Button title="Add Set" color={buttonStyle.selectors.color} onPress={() => setAdd()} />
+        <Button
+          title="Add Set"
+          color={buttonStyle.selectors.color}
+          onPress={() => setAdd()}
+        />
       </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
+  sideBySide: {
+    marginBottom: 15,
+    flexDirection: "row",
+    justifyContent: "center",
+    gap: 10,
+    alignItems: "center",
+    width: "100%",
+  },
   container: {
     flexDirection: "column",
+    // backgroundColor: "dimgray",
     backgroundColor: "grey",
     padding: 20,
     margin: 20,
     borderRadius: 15,
-    marginBottom: 20,
+    marginBottom: 0,
     alignItems: "center",
     // flex: 1,
     width: "100%",
   },
   text: {
     color: "#fff",
-    textAlign: "center",
-    marginBottom: 15,
+    // textAlign: "center",
     fontSize: 24,
   },
   button: {
@@ -175,7 +216,6 @@ const styles = StyleSheet.create({
   set: {
     display: "flex",
     flexDirection: "row",
-    // backgroundColor: "red",
     margin: 20,
     flex: 2,
     // width: "100%",
@@ -201,5 +241,9 @@ const styles = StyleSheet.create({
   },
   checkbox: {
     alignSelf: "center",
+  },
+  deleteButton: {
+    justifyContent: "center",
+    alignItems: "center",
   },
 });

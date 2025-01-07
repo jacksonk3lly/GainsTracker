@@ -226,6 +226,12 @@ export function createWorkoutBasedOnProgram(programId: string) {
   }
 }
 
+export function deleteExerciseUsesWithNoWorkout() {
+  db.execSync(`
+    DELETE FROM ExerciseUses WHERE workout_id IS NULL OR workout_id NOT IN (SELECT id FROM Workouts);
+  `);
+}
+
 export function getIncrementFromPlan(exercisePlanId: number): number {
   const row = db.getFirstSync(
     `SELECT increment FROM ExercisePlan WHERE id = ${exercisePlanId}`
@@ -267,6 +273,30 @@ export function newWorkout() {
   db.execSync(`
     INSERT INTO Workouts (start_time) VALUES (CURRENT_TIMESTAMP);
   `);
+}
+
+export function deleteUncheckedSets(workoutId: number) {
+  getExerciseUseIds(workoutId).forEach((exerciseUseId) => {
+    db.execSync(`DELETE FROM Sets WHERE selected = FALSE AND exercise_use_id = ${exerciseUseId};`);
+  });
+}
+
+export function deleteExerciseUsesWithNoSets(workoutId:number){
+  getExerciseUseIds(workoutId).forEach((exerciseUseId) => {
+    if(getSetIds(exerciseUseId).length === 0){
+      deleteExerciseUse(exerciseUseId);
+    }
+  });
+}
+
+export function deleteWorkout(workoutId: number) {
+  try {
+    db.execSync(`
+    DELETE FROM Workouts WHERE id = ${workoutId};
+  `);
+  } catch (e) {
+    console.error("Error deleting workout:", e);
+  }
 }
 
 export function printWorkouts() {
@@ -409,6 +439,16 @@ export function updateExerciseUseExerciseId(
   `);
 }
 
+export function deleteExerciseUse(exerciseUseId: number) {
+  try {
+    db.execSync(`
+    DELETE FROM ExerciseUses WHERE id = ${exerciseUseId};
+  `);
+  } catch (e) {
+    console.error("Error deleting exercise use:", e);
+  }
+}
+
 export function newExerciseUse(workoutId: number, exerciseId?: string): number {
   if (exerciseId) {
     try {
@@ -522,6 +562,19 @@ export function getExerciseUseIds(workoutId: number): number[] {
   try {
     const rows: { id: number }[] = db.getAllSync(`
     SELECT id FROM ExerciseUses WHERE workout_id = ${workoutId};
+  `);
+
+    return rows.map((row) => row.id);
+  } catch (e) {
+    console.error("Error getting exercise use IDs:", e);
+    return [];
+  }
+}
+
+export function getExerciseUseIdsOfExercise(exerciseId: string): number[] {
+  try {
+    const rows: { id: number }[] = db.getAllSync(`
+    SELECT id FROM ExerciseUses WHERE exercise_id = "${exerciseId}";
   `);
 
     return rows.map((row) => row.id);
