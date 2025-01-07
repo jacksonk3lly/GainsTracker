@@ -95,8 +95,9 @@ const styles = StyleSheet.create({
   container: {
     display: "flex",
     flexDirection: "column",
-    backgroundColor: "dimgray",
-    width: "90%",
+    // backgroundColor: "dimgray",
+    
+    width: "100%",
     borderRadius: 15,
     alignItems: "center",
     justifyContent: "center",

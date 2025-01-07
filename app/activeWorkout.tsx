@@ -64,6 +64,7 @@ const styles = StyleSheet.create({
     display: "flex",
     flexDirection: "column",
     backgroundColor: "#25292e",
+    // backgroundColor: "pink",
     flex: 1,
     width: "100%",
   },

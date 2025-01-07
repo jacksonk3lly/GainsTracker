@@ -176,11 +176,12 @@ const styles = StyleSheet.create({
   },
   container: {
     flexDirection: "column",
+    // backgroundColor: "dimgray",
     backgroundColor: "grey",
     padding: 20,
     margin: 20,
     borderRadius: 15,
-    marginBottom: 20,
+    marginBottom: 0,
     alignItems: "center",
     // flex: 1,
     width: "100%",
