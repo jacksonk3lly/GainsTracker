@@ -294,6 +294,22 @@ export function activeWorkoutExists(): boolean {
   }
 }
 
+export function getWorkoutStartInTime(id:number): number {
+  try {
+    const row = db.getFirstSync(
+      `SELECT start_time FROM Workout WHERE id = ${id};`
+    ) as { start_time: number } | null;
+    if (!row) {
+      return -1;
+    }
+    return row.start_time;
+  } catch (e) {
+    console.error("Error getting start time:", e);
+    return -1;
+  }
+}
+
+
 export function getActiveWorkoutId(): number {
   try {
     const row = db.getFirstSync(
