@@ -327,7 +327,7 @@ export function activeWorkoutExists(): boolean {
 export function getWorkoutStartInTime(id:number): number {
   try {
     const row = db.getFirstSync(
-      `SELECT start_time FROM Workout WHERE id = ${id};`
+      `SELECT start_time FROM Workouts WHERE id = ${id};`
     ) as { start_time: number } | null;
     if (!row) {
       return -1;
