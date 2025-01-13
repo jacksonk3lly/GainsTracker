@@ -19,6 +19,8 @@ export default function activeWorkout() {
   const [hours, setHours] = useState(0);
   const [minutes, setMinutes] = useState(0);
   const [seconds, setSeconds] = useState(0);
+
+
   const router = useRouter();
 
   const submitHandler = () => {
@@ -36,9 +38,9 @@ export default function activeWorkout() {
   
   const timerUpdate = () => {
   let timer =  new Date().getTime() - new Date(workoutTime).getTime();
-
- // Convert milliseconds to hours, minutes, and seconds
- setHours( Math.floor(timer / (1000 * 60 * 60)));
+  
+ // Convert milliseconds to hours, minutes, and seconds, and account, theres a difference in times by 13hrs
+ setHours( Math.floor(timer / (1000 * 60 * 60)) - 13  );
    setMinutes(Math.floor((timer % (1000 * 60 * 60)) / (1000 * 60)));
    setSeconds(Math.floor((timer % (1000 * 60)) / 1000));
 
@@ -50,28 +52,33 @@ export default function activeWorkout() {
   }, []);
 
   return (
+    <View       style={styles.scroll}>
+            <Text style={styles.timer}>Timer: {formattedTime}</Text>
+
     <ScrollView
       showsVerticalScrollIndicator={false}
       style={styles.scroll}
       contentContainerStyle={{ alignItems: "center" }}
     >
-      <Text style={styles.timer}>Timer: {formattedTime}</Text>
 
       <WorkoutCreate workoutId={getActiveWorkoutId()} />
       <View style={{ height: 300, backgroundColor: "red" }}></View>
     </ScrollView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   timer: {
-    marginRight : '72%',
+    marginRight : '50%',
     marginTop: 10,
     borderStyle: "solid",
     borderColor: "white",
-    padding: 4,
+    padding: '2%',
+    width: '50%',
     borderWidth: 5,
-    color: "white",},
+    color: "white",
+  },
 
 
   container: {
