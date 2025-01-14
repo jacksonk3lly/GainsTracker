@@ -2,7 +2,11 @@ import React from "react";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { Stack } from "expo-router";
 import { MenuProvider } from "react-native-popup-menu";
-import { Text } from "react-native";
+import { Platform, Text } from "react-native";
+import WorkoutTimer from "@/components/workoutTimer";
+import Button from "@/components/button";
+
+
 
 export default function RootLayout() {
   return (
@@ -20,9 +24,11 @@ export default function RootLayout() {
           headerTitleStyle: {
             fontFamily: "SedgwickAveDisplay-Regular",
             fontSize: 30,
-          },
+            
+          }, headerLeft: () => <WorkoutTimer />
+          
         }}
-      />
+/>
       <Stack.Screen
         name="exerciseSelect"
         options={{

@@ -22,7 +22,6 @@ import {
 import { useFocusEffect, useRouter } from "expo-router";
 import {buttonStyle} from "@/assets/buttonstyle";
 
-
 export default function WorkoutCreate({ workoutId }: { workoutId: number }) {
   const router = useRouter();
 
