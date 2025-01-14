@@ -60,6 +60,16 @@ export default function exerciseSelect() {
   }
 
   const [exerciseIds, setExerciseIds] = useState(getExerciseIds());
+  const [newExerciseName, setNewExerciseName] = useState("");
+
+  function handleAddExercise() {
+    if (newExerciseName.trim()) {
+      newExercise(newExerciseName);
+      setExerciseIds(getExerciseIds());
+      setNewExerciseName("");
+    }
+  }
+
   console.log(exerciseIds);
 
   return (
@@ -71,6 +81,14 @@ export default function exerciseSelect() {
       {exerciseIds.map((id) => {
         return <ExerciseCard key={id} exerciseId={id} />;
       })}
+      <TextInput
+        style={styles.input}
+        placeholder="New Exercise Name"
+        value={newExerciseName}
+        onChangeText={setNewExerciseName}
+      />
+      <Button title="Create New Exercise" onPress={handleAddExercise} />
+      <View style={{ height: 300, backgroundColor: "red" }}></View>
     </ScrollView>
   );
 }
@@ -96,6 +114,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   input: {
+    marginTop: 20,
     backgroundColor: "#fff",
     color: "#000",
     padding: 10,

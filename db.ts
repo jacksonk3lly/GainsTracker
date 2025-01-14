@@ -393,10 +393,8 @@ export function getMostRecentWorkoutId(): number {
   }
 }
 
-export function newExercise(workoutId: number, id: string) {
-  if (workoutId === -1) {
-    throw new Error("No workout ID provided");
-  }
+export function newExercise(id: string) {
+  console.log("newExercise id", id);
   return db.execAsync(`
     INSERT INTO Exercises (id) VALUES (${id});
   `);
