@@ -17,10 +17,10 @@ import {
   getAllExerciseUses,
   deleteExerciseUse,
   deleteUncheckedSets,
+  deleteExerciseUsesWithNoSets,
 } from "@/db";
 import { useFocusEffect, useRouter } from "expo-router";
 import {buttonStyle} from "@/assets/buttonstyle";
-
 
 export default function WorkoutCreate({ workoutId }: { workoutId: number }) {
   const router = useRouter();
@@ -61,6 +61,7 @@ export default function WorkoutCreate({ workoutId }: { workoutId: number }) {
           onPress: () => {
             endActiveWorkout();
             deleteUncheckedSets(workoutId);
+            deleteExerciseUsesWithNoSets(workoutId);
             router.back();
           },
         },

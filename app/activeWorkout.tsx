@@ -7,14 +7,20 @@ import {
   ScrollView,
   Platform,
 } from "react-native";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "expo-router";
 import WorkoutCreate from "@/components/workoutCreate";
-import { getActiveWorkoutId, getMostRecentWorkoutId } from "@/db";
+import {
+  getActiveWorkoutId,
+  getMostRecentWorkoutId,
+  getWorkoutTime,
+  getWorkoutStartInTime,
+} from "@/db";
 
 export default function activeWorkout() {
   const [name, setName] = useState("");
   const [date, setDate] = useState("");
+
   const router = useRouter();
 
   const submitHandler = () => {

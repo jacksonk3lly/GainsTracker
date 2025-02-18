@@ -21,6 +21,7 @@ import { Set } from "@/types/types";
 import CustomCheckbox from "./CustomCheckbox";
 import { MaterialIcons } from "@expo/vector-icons";
 import { buttonStyle } from "@/assets/buttonstyle";
+import { router } from "expo-router";
 
 function niceText(text: string) {
   text = text.replace(/_/g, " ");
@@ -142,6 +143,13 @@ export default function ExerciseAdd({
   useEffect(() => {
     updateExerciseUseExerciseId(exerciseUseId, exerciseName);
   }, [exerciseName]);
+
+  function onNamePress() {
+    router.push({
+      pathname: "./exerciseHistory",
+      params: { exerciseId: exerciseUseId },
+    });
+  }
 
   return (
     <View key={exerciseUseId} style={styles.container}>

@@ -226,6 +226,12 @@ export function createWorkoutBasedOnProgram(programId: string) {
   }
 }
 
+export function deleteExerciseUsesWithNoWorkout() {
+  db.execSync(`
+    DELETE FROM ExerciseUses WHERE workout_id IS NULL OR workout_id NOT IN (SELECT id FROM Workouts);
+  `);
+}
+
 export function getIncrementFromPlan(exercisePlanId: number): number {
   const row = db.getFirstSync(
     `SELECT increment FROM ExercisePlan WHERE id = ${exercisePlanId}`
@@ -277,6 +283,14 @@ export function deleteUncheckedSets(workoutId: number) {
   });
 }
 
+export function deleteExerciseUsesWithNoSets(workoutId: number) {
+  getExerciseUseIds(workoutId).forEach((exerciseUseId) => {
+    if (getSetIds(exerciseUseId).length === 0) {
+      deleteExerciseUse(exerciseUseId);
+    }
+  });
+}
+
 export function deleteWorkout(workoutId: number) {
   try {
     db.execSync(`
@@ -309,6 +323,21 @@ export function activeWorkoutExists(): boolean {
   } catch (e) {
     console.error("Error checking active workout:", e);
     return false;
+  }
+}
+
+export function getWorkoutStartInTime(id: number): number {
+  try {
+    const row = db.getFirstSync(
+      `SELECT start_time FROM Workouts WHERE id = ${id};`
+    ) as { start_time: number } | null;
+    if (!row) {
+      return -1;
+    }
+    return row.start_time;
+  } catch (e) {
+    console.error("Error getting start time:", e);
+    return -1;
   }
 }
 
@@ -535,6 +564,19 @@ export function getExerciseUseIds(workoutId: number): number[] {
   try {
     const rows: { id: number }[] = db.getAllSync(`
     SELECT id FROM ExerciseUses WHERE workout_id = ${workoutId};
+  `);
+
+    return rows.map((row) => row.id);
+  } catch (e) {
+    console.error("Error getting exercise use IDs:", e);
+    return [];
+  }
+}
+
+export function getExerciseUseIdsOfExercise(exerciseId: string): number[] {
+  try {
+    const rows: { id: number }[] = db.getAllSync(`
+    SELECT id FROM ExerciseUses WHERE exercise_id = "${exerciseId}";
   `);
 
     return rows.map((row) => row.id);
