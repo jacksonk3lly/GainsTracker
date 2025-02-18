@@ -62,6 +62,33 @@ export default function exerciseSelect() {
   const [exerciseIds, setExerciseIds] = useState(getExerciseIds());
   console.log(exerciseIds);
 
+  function NewExerciseUI() {
+    function onCreatePress(exerciseId: string) {
+      console.log(newExercise(exerciseId));
+      console.log("here");
+      setExerciseIds(getExerciseIds());
+    }
+    let exerciseName: string = "";
+    return (
+      <View style={styles.container}>
+        <Text style={styles.text}>Create New Exercise!</Text>
+        <View style={styles.row}>
+          <TextInput
+            style={styles.input}
+            onChangeText={(text) => (exerciseName = text)}
+            placeholder="Exercise Name"
+          />
+          <TouchableOpacity
+            style={styles.buttonContainer}
+            onPress={() => onCreatePress(exerciseName)}
+          >
+            <Text style={styles.smallText}>Create</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    );
+  }
+
   return (
     <ScrollView
       showsVerticalScrollIndicator={false}
@@ -71,6 +98,8 @@ export default function exerciseSelect() {
       {exerciseIds.map((id) => {
         return <ExerciseCard key={id} exerciseId={id} />;
       })}
+      <NewExerciseUI />
+      <View style={{ height: 400 }}></View>
     </ScrollView>
   );
 }
@@ -85,6 +114,12 @@ const styles = StyleSheet.create({
     marginTop: 20,
     justifyContent: "center",
     padding: 20,
+  },
+  row: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 0,
   },
   text: {
     color: "#fff",
@@ -114,12 +149,14 @@ const styles = StyleSheet.create({
 
   buttonContainer: {
     backgroundColor: "green",
-    borderRadius: 15,
-    width: "100%",
+    borderRadius: 3,
+    alignItems: "center",
+    justifyContent: "center",
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.5,
     shadowRadius: 3,
-    elevation: 2,
+    margin: 0.5,
+    height: "70%",
   },
 });

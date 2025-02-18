@@ -271,9 +271,10 @@ export function newWorkout() {
 
 export function deleteUncheckedSets(workoutId: number) {
   getExerciseUseIds(workoutId).forEach((exerciseUseId) => {
-    db.execSync(`DELETE FROM Sets WHERE selected = FALSE AND exercise_use_id = ${exerciseUseId};`);
+    db.execSync(
+      `DELETE FROM Sets WHERE selected = FALSE AND exercise_use_id = ${exerciseUseId};`
+    );
   });
-
 }
 
 export function deleteWorkout(workoutId: number) {
@@ -364,13 +365,14 @@ export function getMostRecentWorkoutId(): number {
   }
 }
 
-export function newExercise(workoutId: number, id: string) {
-  if (workoutId === -1) {
-    throw new Error("No workout ID provided");
+export function newExercise(id: string) {
+  try {
+    return db.execAsync(`
+      INSERT INTO Exercises (id) VALUES ("${id}");
+    `);
+  } catch (e) {
+    console.error("Error creating new exercise:", e);
   }
-  return db.execAsync(`
-    INSERT INTO Exercises (id) VALUES (${id});
-  `);
 }
 
 export function getNumberOfExerciseUses(exerciseId: string): number {

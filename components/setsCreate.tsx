@@ -20,8 +20,7 @@ import {
 import { Set } from "@/types/types";
 import CustomCheckbox from "./CustomCheckbox";
 import { MaterialIcons } from "@expo/vector-icons";
-import {buttonStyle} from "@/assets/buttonstyle";
-
+import { buttonStyle } from "@/assets/buttonstyle";
 
 function niceText(text: string) {
   text = text.replace(/_/g, " ");
@@ -148,8 +147,11 @@ export default function ExerciseAdd({
     <View key={exerciseUseId} style={styles.container}>
       <View key={"binButton"} style={styles.sideBySide}>
         <Text style={styles.text}>{niceText(exerciseName)}</Text>
-        <TouchableOpacity style = {styles.deleteButton} onPress={removeExerciseUse}>
-          <View >
+        <TouchableOpacity
+          style={styles.deleteButton}
+          onPress={removeExerciseUse}
+        >
+          <View>
             <MaterialIcons name="delete" size={27} color="black" />
           </View>
         </TouchableOpacity>
@@ -159,7 +161,11 @@ export default function ExerciseAdd({
       })}
 
       <View style={styles.buttonContainer}>
-        <Button title="Add Set" color={buttonStyle.selectors.color} onPress={() => setAdd()} />
+        <Button
+          title="Add Set"
+          color={buttonStyle.selectors.color}
+          onPress={() => setAdd()}
+        />
       </View>
     </View>
   );

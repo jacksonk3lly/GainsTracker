@@ -33,7 +33,7 @@ export default function activeWorkout() {
     >
       <WorkoutCreate workoutId={getActiveWorkoutId()} />
 
-      <View style={{ height: 300, backgroundColor: "red" }}></View>
+      <View style={{ height: 400, backgroundColor: "red" }}></View>
     </ScrollView>
   );
 }
