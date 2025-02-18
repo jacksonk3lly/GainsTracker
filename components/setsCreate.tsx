@@ -123,11 +123,18 @@ export default function ExerciseAdd({
       setSets((prevSets) => [...prevSets, set]);
     } else {
       const lastSet = sets[sets.length - 1];
-      let newSetObj: Set = newSet(exerciseUseId, 0, 0, false);
       if (lastSet) {
-        newSetObj = newSet(exerciseUseId, lastSet.reps, lastSet.weight, false);
+        let newSetObj = newSet(
+          exerciseUseId,
+          lastSet.reps,
+          lastSet.weight,
+          false
+        );
+        setSets((prevSets) => [...prevSets, newSetObj]);
+      } else {
+        let newSetObj: Set = newSet(exerciseUseId, 0, 0, false);
+        setSets((prevSets) => [...prevSets, newSetObj]);
       }
-      setSets((prevSets) => [...prevSets, newSetObj]);
     }
   }
 
@@ -138,7 +145,7 @@ export default function ExerciseAdd({
         setAdd(set);
       });
     });
-  }, [exerciseUseId]);
+  }, []);
 
   useEffect(() => {
     updateExerciseUseExerciseId(exerciseUseId, exerciseName);
