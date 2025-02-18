@@ -10,14 +10,16 @@ import {
 import { useEffect, useState } from "react";
 import { useRouter } from "expo-router";
 import WorkoutCreate from "@/components/workoutCreate";
-import { getActiveWorkoutId, getMostRecentWorkoutId, getWorkoutTime,getWorkoutStartInTime } from "@/db";
-
+import {
+  getActiveWorkoutId,
+  getMostRecentWorkoutId,
+  getWorkoutTime,
+  getWorkoutStartInTime,
+} from "@/db";
 
 export default function activeWorkout() {
   const [name, setName] = useState("");
   const [date, setDate] = useState("");
-
-
 
   const router = useRouter();
 
@@ -29,25 +31,21 @@ export default function activeWorkout() {
     setDate("");
   };
 
-
   return (
-    <View       style={styles.scroll}>
-    <ScrollView
-      showsVerticalScrollIndicator={false}
-      style={styles.scroll}
-      contentContainerStyle={{ alignItems: "center" }}
-    >
-
-      <WorkoutCreate workoutId={getActiveWorkoutId()} />
-      <View style={{ height: 300, backgroundColor: "red" }}></View>
-    </ScrollView>
+    <View style={styles.scroll}>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        style={styles.scroll}
+        contentContainerStyle={{ alignItems: "center" }}
+      >
+        <WorkoutCreate workoutId={getActiveWorkoutId()} />
+        <View style={{ height: 300, backgroundColor: "red" }}></View>
+      </ScrollView>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-
-
   container: {
     flex: 1,
     backgroundColor: "#25292e",
