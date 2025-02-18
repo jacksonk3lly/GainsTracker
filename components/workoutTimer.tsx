@@ -9,8 +9,9 @@ export default function workoutTimer() {
   const [minutes, setMinutes] = useState(0);
   const [seconds, setSeconds] = useState(0);
 
-  let formattedTime =
-    hours > 0 ? `${hours}h ${minutes}m ${seconds}s` : `${minutes}m ${seconds}s`;
+  let formattedTime = `${seconds}s`;
+  if (minutes > 0) formattedTime = `${minutes}m ${seconds}s`;
+  if (hours > 0) formattedTime = `${hours}h ${minutes}m ${seconds}s`;
   let workoutTime = getWorkoutStartInTime(getActiveWorkoutId());
   let startTime = new Date().getTime();
 
