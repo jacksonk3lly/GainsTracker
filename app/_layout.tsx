@@ -28,6 +28,7 @@ export default function RootLayout() {
           }, headerLeft: () => <WorkoutTimer />
           , headerRight: () =>  <RestButton/>
         }}
+        
 />
       <Stack.Screen
         name="exerciseSelect"

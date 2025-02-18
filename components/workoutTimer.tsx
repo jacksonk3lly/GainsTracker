@@ -42,18 +42,17 @@ export const styles = StyleSheet.create({
         borderStyle: "solid",
         borderColor: "white",
         padding: '2%',
-        width: '30.5%',
-        marginRight: 10,
+        width: '35%',
+        marginRight: '5%',
         borderWidth: 5,
-        marginLeft: -15,
+        marginLeft: '-5%',
         color: "white",
-        marginTop: '10%'
+        marginTop: '10%',
     },
     text: {
-        marginBottom: -8,
-        marginTop: -9,
+        marginBottom: '-10%',
+        marginTop: '-12%',
         padding: 0,
     },
-    rest: {
-    }
+    
 });

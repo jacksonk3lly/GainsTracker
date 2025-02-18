@@ -34,8 +34,8 @@ export default function RestButton() {
     if (unpressed === true) {
         return (
             <View style={styleRest.rest}>
-                <TouchableOpacity onPress={() => setUnpressed(false)}>
-                    <Text> Start Rest</Text>
+                <TouchableOpacity onPressIn={() => (setUnpressed(false),console.log("IN HERE",unpressed))}>
+                    <Text style= {styleRest.text}> Start Rest</Text>
                 </TouchableOpacity>
             </View>
         );
@@ -43,7 +43,7 @@ export default function RestButton() {
         return (
         <View style={styleRest.rest}>
             <Text style={styleRest.timer}> {formattedTime} </Text>
-            <TouchableOpacity onPress={() => setUnpressed(true)}>
+            <TouchableOpacity onPressIn={() => setUnpressed(true)}>
                 <Text style={styleRest.stop}> Stop </Text>
             </TouchableOpacity>
 
@@ -56,25 +56,34 @@ export default function RestButton() {
 
 const styleRest = StyleSheet.create({
     rest: {
-        marginLeft: -83,
-        marginRight: -5,
+        marginLeft: '-22%',
+        marginRight: '-50%',
+        width:'95.5%',
         color: 'black',
         backgroundColor: 'orange',
         borderColor: 'black',
         borderCurve: 'circular',
         borderRadius: 10,
         borderWidth: 5,
-        marginTop: 30,
-        padding: 6,
-        paddingLeft: 2,
+        marginTop: '37%',
+        padding: '2%',
         marginBottom: 0,
+        justifyContent:'space-evenly',  
+        position:'fixed'
+    },
+
+    text:{
+        justifyContent:'center',
+        marginTop:'1%',
+        marginBottom:0,
+        fontSize: 12,
     },
 
     stop: {
         backgroundColor: 'red',
-        marginLeft: 14,
+        marginLeft: '16%',
         fontWeight: '900',
-        width: 40,
+        width: '60%',
         borderColor: 'white',
         borderRadius: 10,
         paddingLeft: 1,
@@ -82,8 +91,8 @@ const styleRest = StyleSheet.create({
     }
 ,
     timer:{
-        marginTop:-15,
-        marginLeft:5
+        marginTop:'-24%',
+        marginLeft:'2%'
     }
 
 
